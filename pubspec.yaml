@@ -1,0 +1,46 @@
+name: bc_golden_plugin
+description: A new Flutter project.
+publish_to: 'none'
+
+version: 1.2.0
+
+environment:
+  sdk: ">=2.18.2 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  platform: ^3.0.0
+
+
+  cupertino_icons: ^1.0.2
+  meta: ^1.3.0
+  file: ^6.1.2
+  provider:
+  equatable: ^2.0.5
+  flutter_svg: ^2.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+
+  assets:
+    - assets/
+  
+  fonts:
+    - family: CIBFontSans-Light
+      fonts:
+        - asset: assets/fonts/CIBFontSans-Light.ttf
+    - family: Roboto-Regular
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+
