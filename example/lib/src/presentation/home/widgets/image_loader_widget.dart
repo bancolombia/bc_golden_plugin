@@ -6,7 +6,7 @@ class ImageLoaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      '../assets/sponge_bob.png',
+      '../assets/LogoBancolombia.png',
       filterQuality: FilterQuality.medium,
     );
   }

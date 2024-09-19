@@ -1,0 +1,22 @@
+name: "flutter-actions"
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
+      - name: Setup Flutter SDK
+        uses: flutter-actions/setup-flutter@v3
+        with:
+          channel: stable
+          version: 3.13.8
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Run tests
+        run: flutter test
