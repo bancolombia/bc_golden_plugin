@@ -34,6 +34,7 @@ migrate_working_dir/
 /analysis_options.yaml
 /codemagic.yaml
 /pubspec.lock
+/coverage
 /.vscode/
 
 # Web related
