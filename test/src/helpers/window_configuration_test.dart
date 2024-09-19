@@ -21,34 +21,4 @@ void main() {
     expect(tester.view.physicalSize, equals(windowConfig.physicalSize));
     expect(tester.view.devicePixelRatio, equals(windowConfig.pixelDensity));
   });
-
-  // testWidgets(
-  //     'configureOpenedKeyboardWindow sets the tester window configuration for opened keyboard correctly',
-  //     (tester) async {
-  //   final windowConfig = WindowConfigData(
-  //     viewInsets: EdgeInsets.only(bottom: 100.0),
-  //     padding: EdgeInsets.all(16.0),
-  //   );
-
-  //   tester.configureOpenedKeyboardWindow(windowConfig);
-
-  //   expect(tester.binding.window.viewInsetsTestValue,
-  //       equals(windowConfig.viewInsets));
-  //   expect(tester.binding.window.paddingTestValue,
-  //       equals(windowConfig.padding.copyWith(bottom: 0)));
-  // });
-
-  // testWidgets(
-  //     'configureClosedKeyboardWindow sets the tester window configuration for closed keyboard correctly',
-  //     (tester) async {
-  //   final windowConfig = WindowConfigData(
-  //     padding: EdgeInsets.all(16.0),
-  //   );
-
-  //   tester.configureClosedKeyboardWindow(windowConfig);
-
-  //   expect(tester.binding.window.viewInsetsTestValue, isNull);
-  //   expect(
-  //       tester.binding.window.paddingTestValue, equals(windowConfig.padding));
-  // });
 }
