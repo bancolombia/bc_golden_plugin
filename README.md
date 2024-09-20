@@ -76,7 +76,7 @@ The following are the windows configurations that are available in the package t
 Here are some examples of how are goldens rendered:
 | device  | example | 
 | ----- | ---- | 
-| `iPhone 8` | ![iPhone8 image](assets/use-cases/home_page_iphone_8.png)| 
+| `iPhone 8` | <img src="assets/use-cases/home_page_iphone.png" alt="drawing" width="300"/>| 
 | `iPad Pro` | ![iPad Pro image](assets/use-cases/home_page_ipad_pro.png)| 
 
 
@@ -106,9 +106,9 @@ bcGoldenTest(
 ## Accessibility. 🦾
 For testing accesibility there is a `textScaleFactor`parameter that will increase the font size depending in the given number, for example:
 
-| iPhone8 normal  | iPhone8 with text scale factor | 
+| iPhone14 normal  | iPhone14 with text scale factor | 
 | ----- | ---- | 
-| ![iPhone8 image](assets/use-cases/home_page_iphone_8.png) | ![iPhone8 text scale](assets/use-cases/home_page_iphone_text_scale_factor.png)|
+| <img src="assets/use-cases/home_page_iphone.png" alt="drawing" width="300"/> | <img src="assets/use-cases/home_page_iphone_text_scale_factor.png" alt="drawing" width="300"/> |
 
 
 
