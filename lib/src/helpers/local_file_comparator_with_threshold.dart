@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../golden_configuration.dart';
@@ -54,17 +56,41 @@ BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 double _kGoldenTestsThreshold =
     bcGoldenConfiguration.getGoldenDifferenceThreshold / 100;
 
-Future<void> localFileComparator(String testUrl) async {
-  final String fileName = testUrl.split('/').last;
+Future<void> localFileComparator(String testPath) async {
+  final String fileName = _getFileName(testPath);
 
   if (goldenFileComparator is LocalFileComparator) {
     goldenFileComparator = LocalFileComparatorWithThreshold(
-        Uri.parse('$testUrl/$fileName' '_golden_test.dart'),
-        _kGoldenTestsThreshold);
+        Uri.parse('$testPath$fileName'), _kGoldenTestsThreshold);
   } else {
     throw Exception(
       goldenFileComparator.runtimeType,
     );
   }
+}
+
+String _getFileName(String testPath) {
+  // Create a Directory object from the given path
+  final dir = Directory(testPath);
+
+  // Check if the directory exists
+  if (!dir.existsSync()) {
+    return 'Directory does not exist';
+  }
+
+  // List all files and filter those that end with _golden_test.dart
+  final goldenTestFiles = dir
+      .listSync()
+      .where((entity) =>
+          entity is File && entity.path.endsWith('_golden_test.dart'))
+      .map((entity) => entity.path.split('/').last)
+      .toList();
+
+  if (goldenTestFiles.isEmpty) {
+    return 'No golden test files found';
+  }
+
+  // Return the first file name found
+  return goldenTestFiles.join('\n');
 }
 // coverage:ignore-end

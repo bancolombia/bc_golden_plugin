@@ -70,9 +70,9 @@ Future<void> bcWidgetMatchesImage({
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
-  final testUrl = (goldenFileComparator as LocalFileComparator).basedir.path;
+  final testPath = (goldenFileComparator as LocalFileComparator).basedir.path;
 
-  final String _imageFinalPath = "$testUrl$_folderPath/$imageName.png";
+  final String _imageFinalPath = "$testPath$_folderPath/$imageName.png";
 
   if (device != null) tester.configureWindow(device);
 
@@ -90,10 +90,10 @@ Future<void> bcWidgetMatchesImage({
 
   await tester.awaitImages();
 
-  await localFileComparator(testUrl);
+  await localFileComparator(testPath);
 
   await expectLater(
-    find.byType(widget.runtimeType),
+    find.byWidget(widget),
     matchesGoldenFile(_imageFinalPath),
   );
 }
