@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.2
+- Update dependencies to be compatible with flutter 3.24 and removed `meta` and `cupertino_icons`.
+
 ## 1.3.1
 - Update README documentation.
 
