@@ -7,8 +7,6 @@ import '../golden_configuration.dart';
 /// so it will take the path to the test and if the value is more than
 /// [_kGoldenTestsThreshold] it will fail the test.
 
-// coverage:ignore-start
-
 class LocalFileComparatorWithThreshold extends LocalFileComparator {
   final double threshold;
 
@@ -76,4 +74,3 @@ Future<void> localFileComparator(String testUrl) async {
     );
   }
 }
-// coverage:ignore-end
