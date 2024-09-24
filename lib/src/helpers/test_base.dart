@@ -64,7 +64,7 @@ class _AppWidgetBaseTest extends StatelessWidget {
           width: width,
           child: MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaleFactor: textScaleFactor,
+              textScaler: TextScaler.linear(textScaleFactor ?? 1),
             ),
             child: widget,
           ),

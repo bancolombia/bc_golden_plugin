@@ -6,7 +6,7 @@ class ButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: ButtonStyle(elevation: MaterialStateProperty.all(10)),
+      style: ButtonStyle(elevation: WidgetStateProperty.all(10)),
       onPressed: () {},
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

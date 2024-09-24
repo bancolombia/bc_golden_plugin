@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Establish a subtree in which adaptive window resolves to the given data.
 /// Use `WindowConfig.of(context)` to retrieve the data in any child widget.
@@ -82,13 +81,13 @@ class WindowConfigData extends Equatable {
   /// This padding describe the size used by an opened keyboard.
   ///
   /// expressed in `px`.
-  final WindowPadding viewInsets;
+  final FakeViewPadding viewInsets;
 
   /// This padding describe the size taken by the hardware layer.
   /// Like the notch on the iPhone X.
   ///
   /// expressed in `px`.
-  final WindowPadding padding;
+  final FakeViewPadding padding;
 
   /// This represent the size of the device, expressed in `px`.
   final Size physicalSize;
@@ -108,8 +107,8 @@ class WindowConfigData extends Equatable {
       ];
 }
 
-/// Implementation of the abstract class [WindowPadding].
-class WindowPaddingImpl implements WindowPadding {
+/// Implementation of the abstract class [FakeViewPadding].
+class WindowPaddingImpl implements FakeViewPadding {
   const WindowPaddingImpl({
     this.bottom = 0,
     this.top = 0,
@@ -144,8 +143,8 @@ class WindowPaddingImpl implements WindowPadding {
       );
 }
 
-extension WindowPaddingX on WindowPadding {
-  WindowPadding copyWith({
+extension WindowPaddingX on FakeViewPadding {
+  FakeViewPadding copyWith({
     double? bottom,
     double? top,
     double? left,
