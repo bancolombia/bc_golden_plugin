@@ -19,13 +19,13 @@ class BcGoldenBaseTest {
         width: width,
         textScaleFactor: textScaleFactor,
       ),
-      theme: customTheme ?? _bcGoldenConfiguration.getThemeData,
+      theme: customTheme ?? _bcGoldenConfiguration.themeData,
     );
 
-    if (_bcGoldenConfiguration.getThemeProvider != null) {
+    if (_bcGoldenConfiguration.themeProvider != null) {
       _appWidget = MaterialApp(
         home: MultiProvider(
-          providers: _bcGoldenConfiguration.getThemeProvider!,
+          providers: _bcGoldenConfiguration.themeProvider!,
           child: _AppWidgetBaseTest(
             widget: widget,
             height: height,
@@ -33,7 +33,7 @@ class BcGoldenBaseTest {
             textScaleFactor: textScaleFactor,
           ),
         ),
-        theme: customTheme ?? _bcGoldenConfiguration.getThemeData,
+        theme: customTheme ?? _bcGoldenConfiguration.themeData,
       );
     }
 

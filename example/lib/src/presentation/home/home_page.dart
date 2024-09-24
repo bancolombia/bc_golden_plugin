@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'widgets/button_widget.dart';
 import 'widgets/image_loader_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,7 +28,6 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
             ImageLoaderWidget(),
-            ButtonWidget(),
           ],
         ),
       ),

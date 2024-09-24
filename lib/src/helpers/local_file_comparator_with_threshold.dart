@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../golden_configuration.dart';
@@ -10,6 +8,7 @@ import '../golden_configuration.dart';
 /// [_kGoldenTestsThreshold] it will fail the test.
 
 // coverage:ignore-start
+
 class LocalFileComparatorWithThreshold extends LocalFileComparator {
   final double threshold;
 
@@ -19,32 +18,40 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
+    final ComparisonResult result = await GoldenFileComparator.compareLists(
       imageBytes,
       await getGoldenBytes(golden),
     );
 
+    if (result.passed) {
+      result.dispose();
+      return true;
+    }
+
     if (!result.passed && result.diffPercent <= threshold) {
       debugPrint(
-        'Se encontró una diferencia de ${result.diffPercent * 100}%, pero es '
-        'un valor aceptable, dado que el porcentaje de aceptación es de '
+        'A difference of ${result.diffPercent * 100}% was found, but it is '
+        'an acceptable value, given that the acceptance threshold is '
         '${threshold * 100}%',
       );
 
       await generateFailureOutput(result, golden, basedir);
 
+      result.dispose();
+
       return true;
     }
 
-    if (!result.passed && bcGoldenConfiguration.getWillFailOnError) {
+    if (!result.passed && bcGoldenConfiguration.willFailOnError) {
       final error = await generateFailureOutput(result, golden, basedir);
       throw FlutterError(error);
     }
 
     debugPrint(
-      'Se encontró una diferencia de ${result.diffPercent * 100}%, pero  '
-      'la opción willFailOnError está en false por lo tanto el test pasa.',
+      'A difference of ${result.diffPercent * 100}% was found, but '
+      'the willFailOnError option is set to false, so the test passes.',
     );
+
     return !result.passed;
   }
 }
@@ -54,43 +61,19 @@ BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 /// This is the constant value of the minimum percent of difference in
 /// a test.
 double _kGoldenTestsThreshold =
-    bcGoldenConfiguration.getGoldenDifferenceThreshold / 100;
+    bcGoldenConfiguration.goldenDifferenceThreshold / 100;
 
-Future<void> localFileComparator(String testPath) async {
-  final String fileName = _getFileName(testPath);
+Future<void> localFileComparator(String testUrl) async {
+  final String fileName = testUrl.split('/').last;
 
   if (goldenFileComparator is LocalFileComparator) {
     goldenFileComparator = LocalFileComparatorWithThreshold(
-        Uri.parse('$testPath$fileName'), _kGoldenTestsThreshold);
+        Uri.parse('$testUrl/$fileName' '_golden_test.dart'),
+        _kGoldenTestsThreshold);
   } else {
     throw Exception(
       goldenFileComparator.runtimeType,
     );
   }
-}
-
-String _getFileName(String testPath) {
-  // Create a Directory object from the given path
-  final dir = Directory(testPath);
-
-  // Check if the directory exists
-  if (!dir.existsSync()) {
-    return 'Directory does not exist';
-  }
-
-  // List all files and filter those that end with _golden_test.dart
-  final goldenTestFiles = dir
-      .listSync()
-      .where((entity) =>
-          entity is File && entity.path.endsWith('_golden_test.dart'))
-      .map((entity) => entity.path.split('/').last)
-      .toList();
-
-  if (goldenTestFiles.isEmpty) {
-    return 'No golden test files found';
-  }
-
-  // Return the first file name found
-  return goldenTestFiles.join('\n');
 }
 // coverage:ignore-end
