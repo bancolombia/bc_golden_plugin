@@ -7,7 +7,6 @@ import '../golden_configuration.dart';
 /// so it will take the path to the test and if the value is more than
 /// [_kGoldenTestsThreshold] it will fail the test.
 
-// coverage:ignore-start
 class LocalFileComparatorWithThreshold extends LocalFileComparator {
   final double threshold;
 
@@ -17,32 +16,40 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
+    final ComparisonResult result = await GoldenFileComparator.compareLists(
       imageBytes,
       await getGoldenBytes(golden),
     );
 
+    if (result.passed) {
+      result.dispose();
+      return true;
+    }
+
     if (!result.passed && result.diffPercent <= threshold) {
       debugPrint(
-        'Se encontró una diferencia de ${result.diffPercent * 100}%, pero es '
-        'un valor aceptable, dado que el porcentaje de aceptación es de '
+        'A difference of ${result.diffPercent * 100}% was found, but it is '
+        'an acceptable value, given that the acceptance threshold is '
         '${threshold * 100}%',
       );
 
       await generateFailureOutput(result, golden, basedir);
 
+      result.dispose();
+
       return true;
     }
 
-    if (!result.passed && bcGoldenConfiguration.getWillFailOnError) {
+    if (!result.passed && bcGoldenConfiguration.willFailOnError) {
       final error = await generateFailureOutput(result, golden, basedir);
       throw FlutterError(error);
     }
 
     debugPrint(
-      'Se encontró una diferencia de ${result.diffPercent * 100}%, pero  '
-      'la opción willFailOnError está en false por lo tanto el test pasa.',
+      'A difference of ${result.diffPercent * 100}% was found, but '
+      'the willFailOnError option is set to false, so the test passes.',
     );
+
     return !result.passed;
   }
 }
@@ -52,7 +59,7 @@ BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 /// This is the constant value of the minimum percent of difference in
 /// a test.
 double _kGoldenTestsThreshold =
-    bcGoldenConfiguration.getGoldenDifferenceThreshold / 100;
+    bcGoldenConfiguration.goldenDifferenceThreshold / 100;
 
 Future<void> localFileComparator(String testUrl) async {
   final String fileName = testUrl.split('/').last;
@@ -67,4 +74,3 @@ Future<void> localFileComparator(String testUrl) async {
     );
   }
 }
-// coverage:ignore-end

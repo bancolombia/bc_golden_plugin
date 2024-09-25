@@ -1,5 +1,6 @@
 import 'package:example/src/presentation/home/home_page.dart';
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
+import 'package:example/src/presentation/home/widgets/button_widget.dart';
 import 'package:flutter/widgets.dart';
 
 void main() {
@@ -8,7 +9,7 @@ void main() {
     (tester) async {
       await bcWidgetMatchesImage(
         imageName: 'golden',
-        widget: const HomePage(title: "Flutter Demo Home Page"),
+        widget: ButtonWidget(),
         tester: tester,
         device: bcCustomWindowConfigData(
           name: 'Prueba',

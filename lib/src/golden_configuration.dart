@@ -23,24 +23,24 @@ class BcGoldenConfiguration {
   double _kGoldenDifferenceThreshold = 10;
   bool _willFailOnError = true;
 
-  set setThemeProvider(List<SingleChildWidget> providers) =>
+  set themeProvider(List<SingleChildWidget>? providers) =>
       _themeProviders = providers;
 
-  List<SingleChildWidget>? get getThemeProvider => _themeProviders;
+  List<SingleChildWidget>? get themeProvider => _themeProviders;
 
-  set setThemeData(ThemeData themeData) => _themeData = themeData;
+  set themeData(ThemeData? themeData) => _themeData = themeData;
 
-  ThemeData? get getThemeData => _themeData;
+  ThemeData? get themeData => _themeData;
 
-  set setGoldenDifferenceThreshold(double kGoldenDifferenceThreshold) =>
+  set goldenDifferenceThreshold(double kGoldenDifferenceThreshold) =>
       _kGoldenDifferenceThreshold = kGoldenDifferenceThreshold;
 
-  double get getGoldenDifferenceThreshold => _kGoldenDifferenceThreshold;
+  double get goldenDifferenceThreshold => _kGoldenDifferenceThreshold;
 
-  set setWillFailOnError(bool willFailOnError) =>
+  set willFailOnError(bool willFailOnError) =>
       _willFailOnError = willFailOnError;
 
-  bool get getWillFailOnError => _willFailOnError;
+  bool get willFailOnError => _willFailOnError;
 }
 
 Future<void> loadConfiguration() async {

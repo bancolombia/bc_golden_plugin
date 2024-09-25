@@ -8,15 +8,15 @@ void main() {
     final configuration = BcGoldenConfiguration();
 
     // Act
-    configuration.setThemeProvider = [/* Add your providers here */];
-    configuration.setThemeData = ThemeData(/* Add your theme data here */);
-    configuration.setGoldenDifferenceThreshold = 20;
-    configuration.setWillFailOnError = false;
+    configuration.themeProvider = [/* Add your providers here */];
+    configuration.themeData = ThemeData(/* Add your theme data here */);
+    configuration.goldenDifferenceThreshold = 20;
+    configuration.willFailOnError = false;
 
     // Assert
-    expect(configuration.getThemeProvider, isNotNull);
-    expect(configuration.getThemeData, isNotNull);
-    expect(configuration.getGoldenDifferenceThreshold, equals(20));
-    expect(configuration.getWillFailOnError, isFalse);
+    expect(configuration.themeProvider, isNotNull);
+    expect(configuration.themeData, isNotNull);
+    expect(configuration.goldenDifferenceThreshold, equals(20));
+    expect(configuration.willFailOnError, isFalse);
   });
 }

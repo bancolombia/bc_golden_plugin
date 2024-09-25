@@ -1,4 +1,3 @@
-
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
 import 'package:bc_golden_plugin/src/helpers/test_base.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +20,10 @@ void main() {
     expect(find.byType(Container), findsOneWidget);
   });
 
-  setUp(() async{
+  setUp(() async {
     BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
-    
-    bcGoldenConfiguration.setThemeData = ThemeData(primaryColor: Colors.red);
+
+    bcGoldenConfiguration.themeData = ThemeData(primaryColor: Colors.red);
 
     await loadConfiguration();
   });
@@ -42,5 +41,4 @@ void main() {
 
     expect(find.byType(Container), findsOneWidget);
   });
-
 }

@@ -8,29 +8,29 @@ import 'window_size.dart';
 extension WidgetTesterWithConfigurableWindow on WidgetTester {
   /// Configure the tester window to represent the given device variant.
   void configureWindow(WindowConfigData windowConfig) {
-    binding.window.physicalSizeTestValue = windowConfig.physicalSize;
-    binding.window.devicePixelRatioTestValue = windowConfig.pixelDensity;
-    binding.window.paddingTestValue = windowConfig.padding;
-    binding.window.viewPaddingTestValue = windowConfig.padding;
+    this.view.physicalSize = windowConfig.physicalSize;
+    this.view.devicePixelRatio = windowConfig.pixelDensity;
+    this.view.padding = windowConfig.padding;
+    this.view.viewPadding = windowConfig.padding;
 
-    addTearDown(binding.window.clearPaddingTestValue);
-    addTearDown(binding.window.clearViewPaddingTestValue);
-    addTearDown(binding.window.clearPhysicalSizeTestValue);
+    addTearDown(this.view.resetPadding);
+    addTearDown(this.view.resetViewPadding);
+    addTearDown(this.view.resetPhysicalSize);
     addTearDown(
-      binding.window.clearDevicePixelRatioTestValue,
+      this.view.resetDevicePixelRatio,
     );
-    addTearDown(binding.window.clearViewInsetsTestValue);
+    addTearDown(this.view.resetViewInsets);
   }
 
   /// Configure the tester window to represent an opened keyboard on the given device variant.
   void configureOpenedKeyboardWindow(WindowConfigData windowConfig) {
-    binding.window.viewInsetsTestValue = windowConfig.viewInsets;
-    binding.window.paddingTestValue = windowConfig.padding.copyWith(bottom: 0);
+    this.view.viewInsets = windowConfig.viewInsets;
+    this.view.padding = windowConfig.padding.copyWith(bottom: 0);
   }
 
   /// Configure the tester window to represent a closed keyboard on the given device variant.
   void configureClosedKeyboardWindow(WindowConfigData windowConfig) {
-    binding.window.clearViewInsetsTestValue();
-    binding.window.paddingTestValue = windowConfig.padding;
+    this.view.resetViewInsets();
+    this.view.padding = windowConfig.padding;
   }
 }
