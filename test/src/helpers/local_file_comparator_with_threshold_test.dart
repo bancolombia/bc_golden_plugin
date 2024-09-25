@@ -63,5 +63,15 @@ void main() {
         expectSync(information[2].level, DiagnosticLevel.info);
       }
     });
+
+    test(
+        'goldenFileComparator should be changed to LocalFileComparatorWithThreshold',
+        () {
+      localFileComparator(
+        'foo_test.dart',
+      );
+
+      expect(goldenFileComparator, isA<LocalFileComparatorWithThreshold>());
+    });
   });
 }
