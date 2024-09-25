@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.4.0
-- Update dependencies to be compatible with flutter 3.24 and removed `meta` and `cupertino_icons`.
+- Update dependencies to be compatible with flutter 3.24 and removed `cupertino_icons`.
 - Changed the getters/setters in the `BcGoldenConfiguration` file.
 
 ## 1.3.1
