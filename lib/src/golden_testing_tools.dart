@@ -86,9 +86,9 @@ Future<void> bcWidgetMatchesImage({
     ),
   );
 
-  await loadAppFonts();
-
   await tester.awaitImages();
+
+  await loadAppFonts();
 
   await localFileComparator(testPath);
 
