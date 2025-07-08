@@ -11,17 +11,32 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// e.g. [awaitImages];
 extension AwaitImages on WidgetTester {
   /// Pauses test until images are ready to be rendered.
-  Future<void> awaitImages() async {
+  /// 
+  /// * [customPump] Optional custom pump function to use instead of pumpAndSettle.
+  /// * [timeout] Optional timeout duration for pumpAndSettle (default is Duration(seconds: 10)).
+  Future<void> awaitImages({
+    Future<void> Function()? customPump,
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
     await runAsync(() async {
+      // Helper function to call either custom pump or pumpAndSettle with timeout
+      Future<void> pumpFunction() async {
+        if (customPump != null) {
+          await customPump();
+        } else {
+          await pumpAndSettle(timeout);
+        }
+      }
+
       for (final element in find.byType(Image).evaluate()) {
         final widget = element.widget as Image;
         final image = widget.image;
         if (image is SvgPicture) {
           await pumpWidget(image as SvgPicture);
-          await pumpAndSettle();
+          await pumpFunction();
         } else {
           await precacheImage(image, element);
-          await pumpAndSettle();
+          await pumpFunction();
         }
       }
 
@@ -32,10 +47,10 @@ extension AwaitImages on WidgetTester {
           final image = decoration.image?.image;
           if (image is SvgPicture) {
             await pumpWidget(image as SvgPicture);
-            await pumpAndSettle();
+            await pumpFunction();
           } else if (image != null) {
             await precacheImage(image, element);
-            await pumpAndSettle();
+            await pumpFunction();
           }
         }
       }

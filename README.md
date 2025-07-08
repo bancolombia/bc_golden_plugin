@@ -221,3 +221,30 @@ bcGoldenTest(
   );
 ```
 This will generate the golden and will make the comparison between the given image and the widget developed.
+
+### Custom Pump for Animations 🎬
+
+For complex widgets with animations that may cause "PumpAndSettle timed out" errors, you can use the `customPump` parameter to control how the widget is pumped during image loading:
+
+```dart
+bcGoldenTest(
+    'animated_widget_golden',
+    (tester) async {
+      await bcWidgetMatchesImage(
+        imageName: 'animated_widget',
+        widget: AnimatedWidget(),
+        tester: tester,
+        // Custom pump function for handling animations
+        customPump: () async {
+          await tester.pump(Duration(milliseconds: 100));
+          await tester.pump(Duration(milliseconds: 100));
+          // Add more pump calls as needed for your animation
+        },
+        // Or use a custom timeout
+        pumpTimeout: Duration(seconds: 30),
+      );
+    },
+  );
+```
+
+The `customPump` parameter allows you to define exactly how the widget should be pumped, while `pumpTimeout` lets you increase the default timeout from 10 seconds to accommodate longer animations.
