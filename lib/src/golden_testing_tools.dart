@@ -58,6 +58,8 @@ void bcGoldenTest(
 /// test with phone screen specifications.
 /// * [customTheme] (optional) if set, it will override the default theme
 /// given in the BcGoldenConfiguration for one test only.
+/// * [customPump] (optional) custom pump function to use instead of pumpAndSettle.
+/// * [pumpTimeout] (optional) timeout duration for pumpAndSettle (default is Duration(seconds: 10)).
 Future<void> bcWidgetMatchesImage({
   required String imageName,
   required Widget widget,
@@ -67,6 +69,8 @@ Future<void> bcWidgetMatchesImage({
   double? textScaleFactor,
   WindowConfigData? device,
   ThemeData? customTheme,
+  Future<void> Function()? customPump,
+  Duration pumpTimeout = const Duration(seconds: 10),
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
@@ -86,7 +90,10 @@ Future<void> bcWidgetMatchesImage({
     ),
   );
 
-  await tester.awaitImages();
+  await tester.awaitImages(
+    customPump: customPump,
+    timeout: pumpTimeout,
+  );
 
   await loadAppFonts();
 
