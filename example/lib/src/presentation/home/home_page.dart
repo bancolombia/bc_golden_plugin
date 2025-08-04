@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'widgets/image_loader_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
+  const HomePage({
+    super.key,
+    required this.title,
+  });
 
   final String title;
 
@@ -23,10 +26,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
+          children: <Widget>[
             ImageLoaderWidget(),
           ],
         ),

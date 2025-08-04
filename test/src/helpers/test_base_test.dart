@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('test appGoldenTest', (tester) async {
     await tester.pumpWidget(
-      BcGoldenBaseTest.appGoldenTest(
+      TestBase.appGoldenTest(
         widget: Container(),
         height: 200,
         width: 200,
@@ -29,7 +29,7 @@ void main() {
   });
   testWidgets('test appGoldenTest', (tester) async {
     await tester.pumpWidget(
-      BcGoldenBaseTest.appGoldenTest(
+      TestBase.appGoldenTest(
         widget: Container(),
         height: 200,
         width: 200,

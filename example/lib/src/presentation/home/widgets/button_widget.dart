@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatelessWidget {
-  const ButtonWidget({Key? key}) : super(key: key);
+  const ButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(elevation: WidgetStateProperty.all(10)),
       onPressed: () {},
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           Text(
-            "CIBSANS",
+            'CIBSANS',
             style: TextStyle(
               fontFamily: 'CIBFontSans-Light',
             ),
           ),
           Text(
-            "ROBOTO",
+            'ROBOTO',
             style: TextStyle(
               fontFamily: 'Roboto-Regular',
               fontWeight: FontWeight.bold,

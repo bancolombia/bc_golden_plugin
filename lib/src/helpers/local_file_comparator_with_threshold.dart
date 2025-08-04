@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../golden_configuration.dart';
+import '../bc_golden_configuration.dart';
 
 /// ### LocalFileComparatorWithThreshold
 /// This class is intended to use a custom value of difference acceptance
@@ -8,11 +8,17 @@ import '../golden_configuration.dart';
 /// [_kGoldenTestsThreshold] it will fail the test.
 
 class LocalFileComparatorWithThreshold extends LocalFileComparator {
+  LocalFileComparatorWithThreshold(
+    super.testFile,
+    this.threshold,
+  ) : assert(
+          threshold >= 0 && threshold <= 1,
+          'The threshold must be between 0 and 1',
+        );
+
   final double threshold;
 
-  LocalFileComparatorWithThreshold(Uri testFile, this.threshold)
-      : assert(threshold >= 0 && threshold <= 1),
-        super(testFile);
+  final int total = 100;
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
@@ -23,14 +29,15 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
 
     if (result.passed) {
       result.dispose();
+
       return true;
     }
 
     if (!result.passed && result.diffPercent <= threshold) {
       debugPrint(
-        'A difference of ${result.diffPercent * 100}% was found, but it is '
+        'A difference of ${result.diffPercent * total}% was found, but it is '
         'an acceptable value, given that the acceptance threshold is '
-        '${threshold * 100}%',
+        '${threshold * total}%',
       );
 
       await generateFailureOutput(result, golden, basedir);
@@ -46,7 +53,7 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
     }
 
     debugPrint(
-      'A difference of ${result.diffPercent * 100}% was found, but '
+      'A difference of ${result.diffPercent * total}% was found, but '
       'the willFailOnError option is set to false, so the test passes.',
     );
 
@@ -66,8 +73,9 @@ Future<void> localFileComparator(String testUrl) async {
 
   if (goldenFileComparator is LocalFileComparator) {
     goldenFileComparator = LocalFileComparatorWithThreshold(
-        Uri.parse('$testUrl/$fileName' '_golden_test.dart'),
-        _kGoldenTestsThreshold);
+      Uri.parse('$testUrl/$fileName' '_golden_test.dart'),
+      _kGoldenTestsThreshold,
+    );
   } else {
     throw Exception(
       goldenFileComparator.runtimeType,

@@ -20,7 +20,16 @@ class WindowConfig extends InheritedWidget {
         .dependOnInheritedWidgetOfExactType<WindowConfig>()
         ?.windowConfig;
     assert(result != null, 'No WindowConfig found in context');
-    return result!;
+
+    return result ??
+        WindowConfigData(
+          'unknown',
+          size: Size.zero,
+          pixelDensity: 1,
+          targetPlatform: TargetPlatform.android,
+          borderRadius: BorderRadius.zero,
+          safeAreaPadding: EdgeInsets.zero,
+        );
   }
 
   @override
@@ -62,7 +71,7 @@ class WindowConfigData extends Equatable {
 
   /// Describes the size of virtual keyboard of the device in `dp`.
   ///
-  /// This is null when the device hasn't a virtual keyboard
+  /// This is null when the device hasn't a virtual keyboard.
   final Size? keyboardSize;
 
   /// Describe the size of the device physical screen top notch in `dp`.
@@ -72,20 +81,19 @@ class WindowConfigData extends Equatable {
 
   /// Device Platform.
   ///
-  /// See: [TargetPlatform]
+  /// See: [TargetPlatform].
   final TargetPlatform targetPlatform;
 
   /// This border radius describe the physical rounded corner of a device.
   final BorderRadius borderRadius;
 
-  /// This padding describe the size used by an opened keyboard.
+  /// This padding describe the size used by an opened keyboard
   ///
   /// expressed in `px`.
   final FakeViewPadding viewInsets;
 
   /// This padding describe the size taken by the hardware layer.
-  /// Like the notch on the iPhone X.
-  ///
+  /// Like the notch on the iPhone X
   /// expressed in `px`.
   final FakeViewPadding padding;
 

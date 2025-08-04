@@ -1,15 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
+
 import 'package:file/file.dart';
 import 'package:file/local.dart';
-import 'package:platform/platform.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:platform/platform.dart';
 
 /// Dart extension to add an await images function to a [WidgetTester] object,
-/// e.g. [awaitImages];
-extension AwaitImages on WidgetTester {
+/// e.g. [awaitImages].
+extension AssetLoader on WidgetTester {
   /// Pauses test until images are ready to be rendered.
   Future<void> awaitImages() async {
     await runAsync(() async {
@@ -43,15 +44,15 @@ extension AwaitImages on WidgetTester {
   }
 }
 
-/// Function to load material icons in runtime
+/// Function to load material icons in runtime.
 Future<void> loadMaterialIconFont() async {
-  const FileSystem fs = LocalFileSystem();
+  const FileSystem fileSystem = LocalFileSystem();
   const Platform platform = LocalPlatform();
   final Directory flutterRoot =
-      fs.directory(platform.environment['FLUTTER_ROOT']);
+      fileSystem.directory(platform.environment['FLUTTER_ROOT']);
 
   final File iconFont = flutterRoot.childFile(
-    fs.path.join(
+    fileSystem.path.join(
       'bin',
       'cache',
       'artifacts',
@@ -67,7 +68,7 @@ Future<void> loadMaterialIconFont() async {
 }
 
 /// ## loadAppFonts() : Future
-/// Function to load fonts in runtime inspired by golden_toolkit
+/// Function to load fonts in runtime inspired by golden_toolkit.
 Future<void> loadAppFonts() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -107,10 +108,12 @@ String derivedFontFamily(Map<String, dynamic> fontDefinition) {
       final String? asset = fontType['asset'];
       if (asset != null && asset.startsWith('packages')) {
         final packageName = asset.split('/')[1];
+
         return 'packages/$packageName/$fontFamily';
       }
     }
   }
+
   return fontFamily;
 }
 
