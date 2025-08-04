@@ -1,4 +1,7 @@
 # Changelog
+## 1.5.0
+- Update to flutter `>= 3.27.0`.
+- Minor patch fixes.
 
 ## 1.4.0
 - Update dependencies to be compatible with flutter 3.24 and removed `cupertino_icons`.
