@@ -1,6 +1,6 @@
+import 'package:bc_golden_plugin/bc_golden_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bc_golden_plugin/src/golden_configuration.dart';
 
 void main() {
   testWidgets('golden configuration test', (tester) async {

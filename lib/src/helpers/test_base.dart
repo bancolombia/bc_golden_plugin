@@ -1,8 +1,9 @@
-import '../golden_configuration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BcGoldenBaseTest {
+import '../bc_golden_configuration.dart';
+
+class TestBase {
   static Widget appGoldenTest({
     required Widget widget,
     double? height,
@@ -10,22 +11,22 @@ class BcGoldenBaseTest {
     double? textScaleFactor,
     ThemeData? customTheme,
   }) {
-    BcGoldenConfiguration _bcGoldenConfiguration = BcGoldenConfiguration();
+    BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 
-    Widget _appWidget = MaterialApp(
+    Widget appWidget = MaterialApp(
       home: _AppWidgetBaseTest(
         widget: widget,
         height: height,
         width: width,
         textScaleFactor: textScaleFactor,
       ),
-      theme: customTheme ?? _bcGoldenConfiguration.themeData,
+      theme: customTheme ?? bcGoldenConfiguration.themeData,
     );
 
-    if (_bcGoldenConfiguration.themeProvider != null) {
-      _appWidget = MaterialApp(
+    if (bcGoldenConfiguration.themeProvider != null) {
+      appWidget = MaterialApp(
         home: MultiProvider(
-          providers: _bcGoldenConfiguration.themeProvider!,
+          providers: bcGoldenConfiguration.themeProvider ?? [],
           child: _AppWidgetBaseTest(
             widget: widget,
             height: height,
@@ -33,11 +34,11 @@ class BcGoldenBaseTest {
             textScaleFactor: textScaleFactor,
           ),
         ),
-        theme: customTheme ?? _bcGoldenConfiguration.themeData,
+        theme: customTheme ?? bcGoldenConfiguration.themeData,
       );
     }
 
-    return _appWidget;
+    return appWidget;
   }
 }
 
@@ -48,12 +49,11 @@ class _AppWidgetBaseTest extends StatelessWidget {
   final double? textScaleFactor;
 
   const _AppWidgetBaseTest({
-    Key? key,
     required this.widget,
     this.width,
     this.height,
     this.textScaleFactor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

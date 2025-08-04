@@ -9,15 +9,15 @@ import 'helpers/test_base.dart';
 import 'helpers/window_configuration.dart';
 import 'helpers/window_size.dart';
 
-const String _folderPath = "goldens";
+const String _folderPath = 'goldens';
 
 /// ## bcGoldenTest
 /// Function to call the golden test, it replaces the testWigets. This functions
 /// are tagged with 'golden'.
 ///
-/// * [description] A brief description of the test,
-/// * [test] The test itself,
-/// * [shouldUseRealShadows] Whether to render shadows or not,
+/// * [description] A brief description of the test.
+/// * [test] The test itself.
+/// * [shouldUseRealShadows] Whether to render shadows or not.
 @isTest
 void bcGoldenTest(
   String description,
@@ -44,7 +44,7 @@ void bcGoldenTest(
   );
 }
 
-///## bcWidgetMatchesImage
+/// ## bcWidgetMatchesImage
 /// This function is intended to receive an image (as the design input) and
 /// render the widget to test according to the given image dimensions.
 /// * [imageName] Name of the image without the extension.
@@ -72,12 +72,12 @@ Future<void> bcWidgetMatchesImage({
 
   final testPath = (goldenFileComparator as LocalFileComparator).basedir.path;
 
-  final String _imageFinalPath = "$testPath$_folderPath/$imageName.png";
+  final String imageFinalPath = '$testPath$_folderPath/$imageName.png';
 
   if (device != null) tester.configureWindow(device);
 
   await tester.pumpWidget(
-    BcGoldenBaseTest.appGoldenTest(
+    TestBase.appGoldenTest(
       widget: widget,
       width: width,
       height: height,
@@ -94,17 +94,17 @@ Future<void> bcWidgetMatchesImage({
 
   await expectLater(
     find.byWidget(widget),
-    matchesGoldenFile(_imageFinalPath),
+    matchesGoldenFile(imageFinalPath),
   );
 }
 
-///## CustomWindowConfigData
+/// ## CustomWindowConfigData
 /// The purpose of this function it's to use a customized phone specifications.
-/// * [name] Name of the configuration,
-/// * [size] The viewport size of the device,
-/// * [pixelDensity] Pixel ratio of the same viewport,
-/// * [targetPlattform] If it's either Android or iOS,
-/// * [safeAreaPadding] Padding used by the device in the safe areas,
+/// * [name] Name of the configuration.
+/// * [size] The viewport size of the device.
+/// * [pixelDensity] Pixel ratio of the same viewport.
+/// * [targetPlattform] If it's either Android or iOS.
+/// * [safeAreaPadding] Padding used by the device in the safe areas.
 WindowConfigData bcCustomWindowConfigData({
   required name,
   required size,
@@ -113,21 +113,23 @@ WindowConfigData bcCustomWindowConfigData({
   borderRadius,
   safeAreaPadding = EdgeInsets.zero,
 }) {
+  const double radius = 48;
+
   return WindowConfigData(
     name,
     size: size,
     pixelDensity: pixelDensity,
     targetPlatform: targetPlatform,
-    borderRadius: borderRadius ?? BorderRadius.circular(48),
+    borderRadius: borderRadius ?? BorderRadius.circular(radius),
     safeAreaPadding: safeAreaPadding,
   );
 }
 
-///## convertToGolden
-///This function is intended to remove the package parameter from the icons to
-///succesfully render in test.
+/// ## convertToGolden
+/// This function is intended to remove the package parameter from the icons to
+/// succesfully render in test.
 ///
-///i.e: BdsFunctionalIcons.HOME.convertToGolden()
+///i.e: BdsFunctionalIcons.HOME.convertToGolden().
 extension IconExtension on IconData {
   IconData convertToGolden() {
     return IconData(
