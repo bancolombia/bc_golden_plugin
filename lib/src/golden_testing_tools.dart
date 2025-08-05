@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 
-import 'helpers/asset_loader.dart';
-import 'helpers/local_file_comparator_with_threshold.dart';
-import 'helpers/test_base.dart';
-import 'helpers/window_configuration.dart';
-import 'helpers/window_size.dart';
+import 'helpers/helpers.dart';
+import 'models/golden_flow_config.dart';
 
 const String _folderPath = 'goldens';
 
@@ -42,6 +39,114 @@ void bcGoldenTest(
     },
     tags: ['golden'],
   );
+}
+
+/// ## goldenFlowTest
+/// A test function that executes a series of steps for golden testing.
+///
+/// This function takes a list of `FlowStep` objects and performs the following:
+/// 1. Renders each step's widget using the provided `widgetBuilder`.
+/// 2. Executes any setup actions defined in the `FlowStep`.
+/// 3. Captures a screenshot after rendering each step.
+/// 4. Combines all captured screenshots into a single image.
+/// 5. Compares the combined image against a golden file to ensure visual consistency.
+///
+/// Parameters:
+/// - [tester]: The widget tester used to interact with the widget tree.
+/// - [description]: A description of the test case.
+/// - [steps]: A list of `FlowStep` objects that define the steps to be executed.
+/// - [config]: A configuration object that contains settings for the golden flow test.
+///
+/// Each `FlowStep` can define:
+/// - `widgetBuilder`: A function that returns the widget to be rendered.
+/// - `setupAction`: An optional function to perform setup actions before capturing the screenshot.
+/// - `verifyAction`: An optional function to perform verification actions after rendering the widget.
+///
+/// The combined screenshot is saved in the 'goldens' directory with a filename based on the test name.
+@isTest
+void goldenFlowTest(
+  String description,
+  List<FlowStep> steps,
+  GoldenFlowConfig config,
+) {
+  testWidgets(description, (tester) async {
+    final screenshots = <Uint8List>[];
+
+    await tester.awaitImages();
+
+    await loadAppFonts();
+
+    for (int index = 0; index < steps.length; index++) {
+      final step = steps[index];
+
+      if (index > 0) {
+        debugPrint('Clearing widget tree before rendering step ${index + 1}');
+        await tester.pump(); // Un pump adicional para asegurar limpieza
+      }
+
+      debugPrint(
+        'Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
+      );
+
+      await tester.pumpWidget(
+        TestBase.appGoldenTest(
+          widget: step.widgetBuilder(),
+        ),
+      );
+
+      debugPrint(
+        '✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
+      );
+
+      if (step.setupAction != null) {
+        await step.setupAction!(tester);
+      }
+
+      debugPrint(
+        '✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+      );
+
+      await tester.pumpAndSettle();
+
+      // if (index > 0) {
+      //   await Future.delayed(config.delayBetweenScreens);
+      // }
+
+      if (step.verifyAction != null) {
+        await step.verifyAction!(tester);
+      }
+
+      debugPrint(
+          '✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}');
+
+      final screenshot = await tester.captureScreenshot();
+
+      debugPrint(
+        '✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+      );
+
+      screenshots.add(screenshot);
+
+      debugPrint(
+        '✓ Captured screen ${index + 1}/${steps.length}: ${step.stepName}',
+      );
+    }
+
+    debugPrint('Combining screenshots...');
+
+    final combinedImage = await tester.combineScreenshots(
+      screenshots,
+      config,
+      steps.map((s) => s.stepName).toList(),
+    );
+
+    debugPrint('✓ Combined screenshots successfully.');
+
+    await expectLater(
+      combinedImage,
+      matchesGoldenFile('goldens/${config.testName}_flow.png'),
+    );
+  });
 }
 
 /// ## bcWidgetMatchesImage

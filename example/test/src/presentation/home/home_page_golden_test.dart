@@ -1,5 +1,5 @@
-import 'package:example/src/presentation/home/home_page.dart';
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
+import 'package:example/src/presentation/home/home_page.dart';
 import 'package:example/src/presentation/home/widgets/button_widget.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,7 +9,7 @@ void main() {
     (tester) async {
       await bcWidgetMatchesImage(
         imageName: 'golden',
-        widget: ButtonWidget(),
+        widget: const ButtonWidget(),
         tester: tester,
         device: bcCustomWindowConfigData(
           name: 'Prueba',
@@ -25,12 +25,27 @@ void main() {
     (tester) async {
       await bcWidgetMatchesImage(
         imageName: 'golden_iphone_14_pro',
-        widget: const HomePage(title: "Flutter Demo Home Page"),
+        widget: const HomePage(title: 'Flutter Demo Home Page'),
         tester: tester,
         device: iPhone14ProMax,
         textScaleFactor: 3.0,
       );
     },
     shouldUseRealShadows: true,
+  );
+
+  goldenFlowTest(
+    'Multiple tests',
+    [
+      FlowStep(
+        stepName: 'home',
+        widgetBuilder: () => const HomePage(title: 'Flutter Demo Home Page'),
+      ),
+      FlowStep(
+        stepName: 'home2',
+        widgetBuilder: () => const ButtonWidget(),
+      ),
+    ],
+    const GoldenFlowConfig(testName: 'multiple_screens'),
   );
 }
