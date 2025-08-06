@@ -43,9 +43,28 @@ void main() {
       ),
       FlowStep(
         stepName: 'home2',
-        widgetBuilder: () => const ButtonWidget(),
+        widgetBuilder: () => const HomePage(
+          title: 'chao',
+        ),
+      ),
+      FlowStep(
+        stepName: 'home2',
+        widgetBuilder: () => const HomePage(
+          title: 'chao',
+        ),
+      ),
+      FlowStep(
+        stepName: 'home2',
+        widgetBuilder: () => const HomePage(
+          title: 'chao',
+        ),
       ),
     ],
-    const GoldenFlowConfig(testName: 'multiple_screens'),
+    const GoldenFlowConfig(
+      testName: 'multiple_screens',
+      layoutType: FlowLayoutType.grid,
+      deviceSize: Size(400, 800),
+      maxScreensPerRow: 3,
+    ),
   );
 }

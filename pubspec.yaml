@@ -27,6 +27,7 @@ dependencies:
   equatable: ^2.0.5
   meta: ^1.9.1
   flutter_svg: ^2.2.0
+  logger: ^2.6.1
 
 dev_dependencies:
 
