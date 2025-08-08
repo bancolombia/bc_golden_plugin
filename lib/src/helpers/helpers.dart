@@ -1,7 +1,7 @@
 library;
 
 export 'asset_loader.dart';
-export 'flows.dart';
+export 'golden_screenshot.dart';
 export 'local_file_comparator_with_threshold.dart';
 export 'logger.dart';
 export 'test_base.dart';

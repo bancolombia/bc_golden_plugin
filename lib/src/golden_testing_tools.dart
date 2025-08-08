@@ -1,3 +1,4 @@
+// ignore_for_file: avoid-ignoring-return-values, avoid-non-null-assertion, prefer-match-file-name
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -69,9 +70,9 @@ void goldenFlowTest(
   List<FlowStep> steps,
   GoldenFlowConfig config,
 ) {
-  testWidgets(description, (tester) async {
-    final screenshots = <Uint8List>[];
+  final GoldenScreenshot screenshotter = GoldenScreenshot();
 
+  testWidgets(description, (tester) async {
     if (config.device != null) {
       tester.configureWindow(config.device!);
     }
@@ -121,20 +122,20 @@ void goldenFlowTest(
       );
 
       await tester.runAsync(() async {
-        final screenshot = await captureScreenshot();
+        final screenshot = await screenshotter.captureScreenshot();
         logDebug(
           '[flows][test] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
         );
 
-        screenshots.add(screenshot);
+        screenshotter.add(screenshot);
       });
     }
 
     logDebug('[flows][test] Combining screenshots...');
 
     await tester.runAsync(() async {
-      final combinedImage = await combineScreenshots(
-        screenshots,
+      final combinedImage = await screenshotter.combineScreenshots(
+        screenshotter.screenshots,
         config,
         steps.map((s) => s.stepName).toList(),
       );
