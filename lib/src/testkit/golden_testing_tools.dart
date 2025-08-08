@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 
-import 'helpers/helpers.dart';
-import 'models/golden_flow_config.dart';
+import '../helpers/helpers.dart';
+import '../config/golden_flow_config.dart';
 
 const String _folderPath = 'goldens';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../bc_golden_configuration.dart';
+import '../config/bc_golden_configuration.dart';
 
 class TestBase {
   static Widget appGoldenTest({

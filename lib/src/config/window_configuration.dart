@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'window_size.dart';
+import '../testkit/window_size.dart';
 
 /// Dart extension to add configuration functions to a [WidgetTester] object,
 /// e.g. [configureWindow], [configureOpenedKeyboardWindow],

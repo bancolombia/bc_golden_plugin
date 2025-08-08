@@ -1,6 +1,6 @@
 import 'dart:io' as io;
 
-import 'package:bc_golden_plugin/src/helpers/local_file_comparator_with_threshold.dart';
+import 'package:bc_golden_plugin/src/comparators/local_file_comparator_with_threshold.dart';
 import 'package:file/memory.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';

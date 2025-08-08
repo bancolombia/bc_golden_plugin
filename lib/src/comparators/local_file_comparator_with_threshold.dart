@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../bc_golden_configuration.dart';
+import '../config/bc_golden_configuration.dart';
 
 /// ### LocalFileComparatorWithThreshold
 /// This class is intended to use a custom value of difference acceptance

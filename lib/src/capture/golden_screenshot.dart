@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../models/golden_flow_config.dart';
-import 'logger.dart';
+import '../config/golden_flow_config.dart';
+import '../helpers/logger.dart';
 
 class GoldenScreenshot {
   final _screenshots = <Uint8List>[];
