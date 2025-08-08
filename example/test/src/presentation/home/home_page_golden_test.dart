@@ -60,10 +60,10 @@ void main() {
         ),
       ),
     ],
-    const GoldenFlowConfig(
+    GoldenFlowConfig(
       testName: 'multiple_screens',
       layoutType: FlowLayoutType.grid,
-      deviceSize: Size(400, 800),
+      device: iPhone13,
       maxScreensPerRow: 3,
     ),
   );

@@ -19,12 +19,6 @@ Future<Uint8List> captureScreenshot() async {
       .first
       .renderObject as RenderRepaintBoundary;
 
-  if (boundary == null) {
-    throw Exception(
-      'No RepaintBoundary found. Wrap your widget with RepaintBoundary.',
-    );
-  }
-
   logDebug('[flows][captureScreenshot] Capturing screenshot...');
 
   final ui.Image image = boundary.toImageSync();
@@ -139,6 +133,7 @@ Future<Uint8List> combineScreenshots(
       '[flows][combineScreenshots] Decoding first image to get dimensions...',
     );
     final firstImage = await _decodeImage(screenshots.first);
+
     final screenWidth = firstImage.width.toDouble();
     final screenHeight = firstImage.height.toDouble();
 
@@ -195,7 +190,6 @@ Future<Uint8List> combineScreenshots(
           config,
         );
 
-        // Dibujar la imagen escalada
         final srcRect = Rect.fromLTWH(
           0,
           0,
@@ -314,7 +308,7 @@ Offset _calculateImagePosition(
   GoldenFlowConfig config,
 ) {
   const titleHeight = 40.0;
-  const padding = 10.0;
+  const padding = 20.0;
 
   switch (config.layoutType) {
     case FlowLayoutType.vertical:

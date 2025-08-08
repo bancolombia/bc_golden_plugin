@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -74,9 +72,13 @@ void goldenFlowTest(
   testWidgets(description, (tester) async {
     final screenshots = <Uint8List>[];
 
-    await tester.awaitImages();
+    if (config.device != null) {
+      tester.configureWindow(config.device!);
+    }
 
     await loadAppFonts();
+
+    await tester.awaitImages();
 
     for (int index = 0; index < steps.length; index++) {
       final step = steps[index];
@@ -96,9 +98,9 @@ void goldenFlowTest(
         '[flows][test] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
       );
 
-      // if (step.setupAction != null) {
-      //   await step.setupAction!(tester);
-      // }
+      if (step.setupAction != null) {
+        await step.setupAction!(tester);
+      }
 
       logDebug(
         '[flows][test] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
@@ -106,13 +108,13 @@ void goldenFlowTest(
 
       await tester.pumpAndSettle();
 
-      // if (index > 0) {
-      //   await Future.delayed(config.delayBetweenScreens);
-      // }
+      if (index > 0) {
+        await tester.pump(config.delayBetweenScreens);
+      }
 
-      // if (step.verifyAction != null) {
-      //   await step.verifyAction!(tester);
-      // }
+      if (step.verifyAction != null) {
+        await step.verifyAction!(tester);
+      }
 
       logDebug(
         '[flows][test] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
