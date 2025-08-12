@@ -44,19 +44,19 @@ void main() {
       FlowStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
-          title: 'chao',
+          title: 'Page 1',
         ),
       ),
       FlowStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
-          title: 'chao',
+          title: 'Page 2',
         ),
       ),
       FlowStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
-          title: 'chao',
+          title: 'Page 3',
         ),
       ),
     ],
