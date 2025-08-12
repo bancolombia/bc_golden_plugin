@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../bc_golden_configuration.dart';
+import '../config/bc_golden_configuration.dart';
 
 class TestBase {
   static Widget appGoldenTest({
     required Widget widget,
+    GlobalKey? key,
     double? height,
     double? width,
     double? textScaleFactor,
@@ -14,6 +15,7 @@ class TestBase {
     BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 
     Widget appWidget = MaterialApp(
+      key: key,
       home: _AppWidgetBaseTest(
         widget: widget,
         height: height,
@@ -25,6 +27,7 @@ class TestBase {
 
     if (bcGoldenConfiguration.themeProvider != null) {
       appWidget = MaterialApp(
+        key: key,
         home: MultiProvider(
           providers: bcGoldenConfiguration.themeProvider ?? [],
           child: _AppWidgetBaseTest(

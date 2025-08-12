@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/single_child_widget.dart';
 
-import 'helpers/asset_loader.dart';
+import '../helpers/asset_loader.dart';
 
 /// ## BcGoldenConfiguration
 /// This class contains all the configuration that uses the tests to run.

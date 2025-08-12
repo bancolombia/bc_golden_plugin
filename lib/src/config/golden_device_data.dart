@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-import 'helpers/window_size.dart';
+import '../testkit/window_size.dart';
 
 /// [WindowConfigData] for an iPhone 8.
 final WindowConfigData iPhone8 = WindowConfigData(

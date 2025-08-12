@@ -1,10 +1,12 @@
+// ignore_for_file: avoid-ignoring-return-values, avoid-non-null-assertion, prefer-match-file-name
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 
-import 'helpers/helpers.dart';
-import 'models/golden_flow_config.dart';
+import '../config/golden_flow_config.dart';
+import '../helpers/helpers.dart';
+import '../helpers/logger.dart';
 
 const String _folderPath = 'goldens';
 
@@ -69,83 +71,83 @@ void goldenFlowTest(
   List<FlowStep> steps,
   GoldenFlowConfig config,
 ) {
-  testWidgets(description, (tester) async {
-    final screenshots = <Uint8List>[];
+  final GoldenScreenshot screenshotter = GoldenScreenshot();
 
-    await tester.awaitImages();
+  testWidgets(description, (tester) async {
+    if (config.device != null) {
+      tester.configureWindow(config.device!);
+    }
 
     await loadAppFonts();
+
+    await tester.awaitImages();
 
     for (int index = 0; index < steps.length; index++) {
       final step = steps[index];
 
-      if (index > 0) {
-        debugPrint('Clearing widget tree before rendering step ${index + 1}');
-        await tester.pump(); // Un pump adicional para asegurar limpieza
-      }
-
-      debugPrint(
-        'Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
+      logDebug(
+        '[flows][test] Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
       );
 
       await tester.pumpWidget(
         TestBase.appGoldenTest(
           widget: step.widgetBuilder(),
+          key: GlobalKey(),
         ),
       );
 
-      debugPrint(
-        '✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
+      logDebug(
+        '[flows][test] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
       );
 
       if (step.setupAction != null) {
         await step.setupAction!(tester);
       }
 
-      debugPrint(
-        '✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+      logDebug(
+        '[flows][test] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
       );
 
       await tester.pumpAndSettle();
 
-      // if (index > 0) {
-      //   await Future.delayed(config.delayBetweenScreens);
-      // }
+      if (index > 0) {
+        await tester.pump(config.delayBetweenScreens);
+      }
 
       if (step.verifyAction != null) {
         await step.verifyAction!(tester);
       }
 
-      debugPrint(
-          '✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}');
-
-      final screenshot = await tester.captureScreenshot();
-
-      debugPrint(
-        '✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+      logDebug(
+        '[flows][test] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
       );
 
-      screenshots.add(screenshot);
+      await tester.runAsync(() async {
+        final screenshot = await screenshotter.captureScreenshot();
+        logDebug(
+          '[flows][test] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+        );
 
-      debugPrint(
-        '✓ Captured screen ${index + 1}/${steps.length}: ${step.stepName}',
-      );
+        screenshotter.add(screenshot);
+      });
     }
 
-    debugPrint('Combining screenshots...');
+    logDebug('[flows][test] Combining screenshots...');
 
-    final combinedImage = await tester.combineScreenshots(
-      screenshots,
-      config,
-      steps.map((s) => s.stepName).toList(),
-    );
+    await tester.runAsync(() async {
+      final combinedImage = await screenshotter.combineScreenshots(
+        screenshotter.screenshots,
+        config,
+        steps.map((s) => s.stepName).toList(),
+      );
 
-    debugPrint('✓ Combined screenshots successfully.');
+      logDebug('[flows][test] ✓ Combined screenshots successfully.');
 
-    await expectLater(
-      combinedImage,
-      matchesGoldenFile('goldens/${config.testName}_flow.png'),
-    );
+      await expectLater(
+        combinedImage,
+        matchesGoldenFile('goldens/${config.testName}_flow.png'),
+      );
+    });
   });
 }
 

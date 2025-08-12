@@ -1,5 +1,5 @@
-import 'package:bc_golden_plugin/src/helpers/window_configuration.dart';
-import 'package:bc_golden_plugin/src/helpers/window_size.dart';
+import 'package:bc_golden_plugin/src/config/window_configuration.dart';
+import 'package:bc_golden_plugin/src/testkit/window_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

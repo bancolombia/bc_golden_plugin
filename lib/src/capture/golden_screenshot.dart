@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -6,9 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../models/golden_flow_config.dart';
+import '../config/golden_flow_config.dart';
+import '../helpers/logger.dart';
 
-extension Flows on WidgetTester {
+class GoldenScreenshot {
+  final _screenshots = <Uint8List>[];
+
+  void add(Uint8List screenshot) {
+    if (screenshot.isEmpty) {
+      logError('[flows][GoldenScreenshot] Empty screenshot added');
+
+      return;
+    }
+    _screenshots.add(screenshot);
+    logDebug(
+      '[flows][GoldenScreenshot] Screenshot added, total count: ${_screenshots.length}',
+    );
+  }
+
+  List<Uint8List> get screenshots => _screenshots;
+
   Future<Uint8List> captureScreenshot() async {
     final RenderRepaintBoundary boundary = find
         .byElementPredicate(
@@ -18,27 +36,99 @@ extension Flows on WidgetTester {
         .first
         .renderObject as RenderRepaintBoundary;
 
-    if (boundary == null) {
-      throw Exception(
-        'No RepaintBoundary found. Wrap your widget with RepaintBoundary.',
+    logDebug('[flows][captureScreenshot] Capturing screenshot...');
+
+    final ui.Image image = boundary.toImageSync();
+
+    logDebug(
+      '[flows][captureScreenshot] Screenshot captured, converting to bytes...',
+    );
+
+    final ui.Image croppedImage = await _cropImage(
+      image,
+      Offset.zero,
+      Size(
+        boundary.size.width,
+        boundary.size.height,
+      ),
+    );
+
+    logDebug('[flows][captureScreenshot] Screenshot cropped to size: '
+        '${croppedImage.width}x${croppedImage.height}');
+
+    final ByteData? byteData = await croppedImage
+        .toByteData(
+          format: ui.ImageByteFormat.png,
+        )
+        .timeout(
+          const Duration(seconds: 2),
+        );
+
+    image.dispose();
+
+    if (byteData == null) {
+      throw Exception('Failed to get byte data from image');
+    }
+
+    logDebug('[flows][captureScreenshot] Screenshot converted to bytes.');
+
+    return byteData.buffer.asUint8List();
+  }
+
+  Future<ui.Image> _cropImage(
+    ui.Image image,
+    Offset topLeft,
+    Size size,
+  ) async {
+    final top = topLeft.dy.round();
+    final left = topLeft.dx.round();
+    final width = size.width.round();
+    final height = size.height.round();
+
+    logDebug('[flows][_cropImage] Cropping image: '
+        'top: $top, left: $left, width: $width, height: $height');
+
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    if (byteData == null) {
+      throw Exception('Failed to get byte data from image');
+    }
+
+    const bytesPerPixel = 4;
+
+    final originalBytes = byteData.buffer.asUint8List();
+    final originalWidth = image.width;
+
+    final croppedBytes = Uint8List(width * height * bytesPerPixel);
+
+    logDebug('[flows][_cropImage] Creating cropped bytes buffer: '
+        '${croppedBytes.length} bytes');
+
+    for (int row = 0; row < height; row++) {
+      final srcStart = ((top + row) * originalWidth + left) * bytesPerPixel;
+      final destStart = row * width * bytesPerPixel;
+      croppedBytes.setRange(
+        destStart,
+        destStart + width * bytesPerPixel,
+        originalBytes,
+        srcStart,
       );
     }
 
-    debugPrint('Capturing screenshot...');
+    logDebug('[flows][_cropImage] Cropped bytes created successfully.');
 
-    final ui.Image image = await boundary.toImage(
-      pixelRatio: view.devicePixelRatio,
+    final completer = Completer<ui.Image>();
+
+    ui.decodeImageFromPixels(
+      croppedBytes,
+      width,
+      height,
+      ui.PixelFormat.rgba8888,
+      completer.complete as ui.ImageDecoderCallback,
     );
 
-    debugPrint('Screenshot captured, converting to bytes...');
+    logDebug('[flows][_cropImage] Decoding cropped image from pixels...');
 
-    final ByteData? byteData = await image.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-
-    debugPrint('Screenshot converted to bytes.');
-
-    return byteData!.buffer.asUint8List();
+    return completer.future;
   }
 
   Future<Uint8List> combineScreenshots(
@@ -46,23 +136,28 @@ extension Flows on WidgetTester {
     GoldenFlowConfig config,
     List<String> stepNames,
   ) async {
-    debugPrint(
-        'Starting combineScreenshots with ${screenshots.length} screenshots');
+    logDebug(
+      '[flows][combineScreenshots] Starting combineScreenshots with ${screenshots.length} screenshots',
+    );
 
     if (screenshots.isEmpty) {
+      logError('No screenshots provided to combine');
       throw ArgumentError('No screenshots to combine');
     }
 
     try {
-      // Decodificar la primera imagen para obtener dimensiones
-      debugPrint('Decoding first image to get dimensions...');
+      logDebug(
+        '[flows][combineScreenshots] Decoding first image to get dimensions...',
+      );
       final firstImage = await _decodeImage(screenshots.first);
+
       final screenWidth = firstImage.width.toDouble();
       final screenHeight = firstImage.height.toDouble();
 
-      debugPrint('Screen dimensions: ${screenWidth}x${screenHeight}');
+      logDebug(
+        '[flows][combineScreenshots] Screen dimensions: ${screenWidth}x$screenHeight',
+      );
 
-      // Calcular dimensiones del canvas final
       final canvasDimensions = _calculateCanvasDimensions(
         screenshots.length,
         screenWidth,
@@ -70,12 +165,11 @@ extension Flows on WidgetTester {
         config,
       );
 
-      debugPrint(
-          'Canvas dimensions: ${canvasDimensions.width}x${canvasDimensions.height}');
+      logDebug(
+        '[flows][combineScreenshots] Canvas dimensions: ${canvasDimensions.width}x${canvasDimensions.height}',
+      );
 
-      // Crear el canvas con un límite de tamaño razonable
-      final maxCanvasSize =
-          4096; // Límite de tamaño para evitar problemas de memoria
+      const maxCanvasSize = 4096;
       final scaleFactor = canvasDimensions.width > maxCanvasSize ||
               canvasDimensions.height > maxCanvasSize
           ? maxCanvasSize /
@@ -85,23 +179,24 @@ extension Flows on WidgetTester {
       final finalWidth = (canvasDimensions.width * scaleFactor).toInt();
       final finalHeight = (canvasDimensions.height * scaleFactor).toInt();
 
-      debugPrint(
-          'Final canvas size: ${finalWidth}x${finalHeight} (scale: $scaleFactor)');
+      logDebug(
+        '[flows][combineScreenshots] Final canvas size: ${finalWidth}x$finalHeight (scale: $scaleFactor)',
+      );
 
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
 
-      // Fondo blanco
       canvas.drawRect(
         Rect.fromLTWH(0, 0, finalWidth.toDouble(), finalHeight.toDouble()),
         Paint()..color = Colors.white,
       );
 
-      debugPrint('Drawing screenshots on canvas...');
+      logDebug('[flows][combineScreenshots] Drawing screenshots on canvas...');
 
-      // Procesar cada screenshot
       for (int i = 0; i < screenshots.length; i++) {
-        debugPrint('Processing screenshot ${i + 1}/${screenshots.length}');
+        logDebug(
+          '[flows][combineScreenshots] Processing screenshot ${i + 1}/${screenshots.length}',
+        );
 
         try {
           final image = await _decodeImage(screenshots[i]);
@@ -112,9 +207,12 @@ extension Flows on WidgetTester {
             config,
           );
 
-          // Dibujar la imagen escalada
           final srcRect = Rect.fromLTWH(
-              0, 0, image.width.toDouble(), image.height.toDouble());
+            0,
+            0,
+            image.width.toDouble(),
+            image.height.toDouble(),
+          );
           final dstRect = Rect.fromLTWH(
             position.dx,
             position.dy,
@@ -124,7 +222,6 @@ extension Flows on WidgetTester {
 
           canvas.drawImageRect(image, srcRect, dstRect, Paint());
 
-          // Dibujar el título del paso
           _drawStepTitle(
             canvas,
             stepNames[i],
@@ -134,7 +231,6 @@ extension Flows on WidgetTester {
             scaleFactor,
           );
 
-          // Dibujar borde
           _drawBorder(
             canvas,
             position,
@@ -142,42 +238,45 @@ extension Flows on WidgetTester {
             screenHeight * scaleFactor,
           );
 
-          // Liberar memoria de la imagen
           image.dispose();
         } catch (e) {
-          debugPrint('Error processing screenshot $i: $e');
+          logError(
+            '[flows][combineScreenshots] Error processing screenshot $i: $e',
+          );
           rethrow;
         }
       }
 
-      debugPrint('Converting canvas to image...');
+      logDebug('[flows][combineScreenshots] Converting canvas to image...');
 
-      // Convertir a imagen con manejo de errores
       final picture = recorder.endRecording();
       final finalImage = await picture.toImage(finalWidth, finalHeight);
 
-      debugPrint('Converting image to bytes...');
+      logDebug('[flows][combineScreenshots] Converting image to bytes...');
 
       final byteData = await finalImage.toByteData(
         format: ui.ImageByteFormat.png,
       );
 
-      // Limpiar recursos
       finalImage.dispose();
       picture.dispose();
 
       if (byteData == null) {
+        logError(
+            '[flows][combineScreenshots] Failed to convert image to bytes');
         throw Exception('Failed to convert image to bytes');
       }
 
       final result = byteData.buffer.asUint8List();
-      debugPrint(
-          '✓ Successfully combined screenshots. Final size: ${result.length} bytes');
+      logDebug(
+        '[flows][combineScreenshots] ✓ Successfully combined screenshots. Final size: ${result.length} bytes',
+      );
 
       return result;
     } catch (e) {
-      debugPrint('Error in combineScreenshots: $e');
-      debugPrint('Stack trace: ${StackTrace.current}');
+      logError('[flows][combineScreenshots] Error in combineScreenshots: $e');
+      logError(
+          '[flows][combineScreenshots] Stack trace: ${StackTrace.current}');
       rethrow;
     }
   }
@@ -185,6 +284,7 @@ extension Flows on WidgetTester {
   Future<ui.Image> _decodeImage(Uint8List bytes) async {
     final codec = await ui.instantiateImageCodec(bytes);
     final frame = await codec.getNextFrame();
+
     return frame.image;
   }
 
@@ -227,7 +327,7 @@ extension Flows on WidgetTester {
     GoldenFlowConfig config,
   ) {
     const titleHeight = 40.0;
-    const padding = 10.0;
+    const padding = 20.0;
 
     switch (config.layoutType) {
       case FlowLayoutType.vertical:

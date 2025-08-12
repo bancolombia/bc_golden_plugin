@@ -100,7 +100,8 @@ dart_code_linter:
     - no-boolean-literal-compare
     - no-empty-block # Quitarla puede ser una opcion
     - no-equal-then-else
-    - no-magic-number
+    - no-magic-number:
+      severity: none
     - prefer-trailing-comma: #S/N​
         severity: none
     - prefer-conditional-expressions
