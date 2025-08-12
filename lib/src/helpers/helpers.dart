@@ -6,4 +6,3 @@ export '../config/window_configuration.dart';
 export '../testkit/test_base.dart';
 export '../testkit/window_size.dart';
 export 'asset_loader.dart';
-export 'logger.dart';
