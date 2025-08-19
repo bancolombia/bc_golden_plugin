@@ -25,13 +25,13 @@ The main focus of this package is to compare either components or widgets agains
 
 Let's start with an example of use case, consider the following design:
 
-![Input image](assets/use-cases/insumo.png)
+![Input image](doc/images/use-cases/insumo.png)
 
 Normally we need to schedule a review with someone of the design team to make a quality assurance, this could increase the time to market while waiting for that meeting. So, in solution to this problematic, we've come to the conclusion that we could use the **Golden Image Testing** but with a different approach.
 
 So now consider the following image as the result of the development process:
 
-![Development image](assets/use-cases/golden_image.png)
+![Development image](doc/images/use-cases/golden_image.png)
 
 As you can see there are actually visual differences.
 
@@ -76,8 +76,8 @@ The following are the windows configurations that are available in the package t
 Here are some examples of how are goldens rendered:
 | device  | example | 
 | ----- | ---- | 
-| `iPhone 8` | <img src="assets/use-cases/home_page_iphone.png" alt="drawing" width="300"/>| 
-| `iPad Pro` | ![iPad Pro image](assets/use-cases/home_page_ipad_pro.png)| 
+| `iPhone 8` | <img src="doc/images/use-cases/home_page_iphone.png" alt="drawing" width="300"/>| 
+| `iPad Pro` | ![iPad Pro image](doc/images/use-cases/home_page_ipad_pro.png)| 
 
 
 ## Custom Window Configuration 
@@ -108,7 +108,7 @@ For testing accesibility there is a `textScaleFactor`parameter that will increas
 
 | iPhone14 normal  | iPhone14 with text scale factor | 
 | ----- | ---- | 
-| <img src="assets/use-cases/home_page_iphone.png" alt="drawing" width="300"/> | <img src="assets/use-cases/home_page_iphone_text_scale_factor.png" alt="drawing" width="300"/> |
+| <img src="doc/images/use-cases/home_page_iphone.png" alt="drawing" width="300"/> | <img src="doc/images/use-cases/home_page_iphone_text_scale_factor.png" alt="drawing" width="300"/> |
 
 
 

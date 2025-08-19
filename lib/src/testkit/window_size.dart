@@ -8,10 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// See also: [WindowConfigData].
 class WindowConfig extends InheritedWidget {
   const WindowConfig({
-    Key? key,
+    required super.child,
     required this.windowConfig,
-    required Widget child,
-  }) : super(key: key, child: child);
+    super.key,
+  });
 
   final WindowConfigData windowConfig;
 

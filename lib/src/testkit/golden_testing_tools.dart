@@ -26,6 +26,7 @@ void bcGoldenTest(
   testWidgets(
     description,
     (widgetTester) async {
+      //ignore: always_declare_return_types
       body() async {
         final initialDebugDisableShadowsValue = debugDisableShadows;
         debugDisableShadows = !shouldUseRealShadows;
@@ -54,7 +55,6 @@ void bcGoldenTest(
 /// 5. Compares the combined image against a golden file to ensure visual consistency.
 ///
 /// Parameters:
-/// - [tester]: The widget tester used to interact with the widget tree.
 /// - [description]: A description of the test case.
 /// - [steps]: A list of `FlowStep` objects that define the steps to be executed.
 /// - [config]: A configuration object that contains settings for the golden flow test.
@@ -210,7 +210,7 @@ Future<void> bcWidgetMatchesImage({
 /// * [name] Name of the configuration.
 /// * [size] The viewport size of the device.
 /// * [pixelDensity] Pixel ratio of the same viewport.
-/// * [targetPlattform] If it's either Android or iOS.
+/// * [targetPlatform] If it's either Android or iOS.
 /// * [safeAreaPadding] Padding used by the device in the safe areas.
 WindowConfigData bcCustomWindowConfigData({
   required name,

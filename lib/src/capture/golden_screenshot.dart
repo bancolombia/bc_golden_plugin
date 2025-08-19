@@ -149,7 +149,8 @@ class GoldenScreenshot {
       logDebug(
         '[flows][combineScreenshots] Decoding first image to get dimensions...',
       );
-      final firstImage = await _decodeImage(screenshots.first);
+      final firstImage =
+          await _decodeImage(screenshots.firstOrNull ?? Uint8List(0));
 
       final screenWidth = firstImage.width.toDouble();
       final screenHeight = firstImage.height.toDouble();
@@ -191,17 +192,19 @@ class GoldenScreenshot {
         Paint()..color = Colors.white,
       );
 
-      logDebug('[flows][combineScreenshots] Drawing screenshots on canvas...');
+      logDebug(
+        '[flows][combineScreenshots] Drawing screenshots on canvas...',
+      );
 
-      for (int i = 0; i < screenshots.length; i++) {
+      for (int index = 0; index < screenshots.length; index++) {
         logDebug(
-          '[flows][combineScreenshots] Processing screenshot ${i + 1}/${screenshots.length}',
+          '[flows][combineScreenshots] Processing screenshot ${index + 1}/${screenshots.length}',
         );
 
         try {
-          final image = await _decodeImage(screenshots[i]);
+          final image = await _decodeImage(screenshots[index]);
           final position = _calculateImagePosition(
-            i,
+            index,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
             config,
@@ -224,7 +227,7 @@ class GoldenScreenshot {
 
           _drawStepTitle(
             canvas,
-            stepNames[i],
+            stepNames[index],
             position,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
@@ -241,7 +244,7 @@ class GoldenScreenshot {
           image.dispose();
         } catch (e) {
           logError(
-            '[flows][combineScreenshots] Error processing screenshot $i: $e',
+            '[flows][combineScreenshots] Error processing screenshot $index: $e',
           );
           rethrow;
         }
@@ -263,7 +266,8 @@ class GoldenScreenshot {
 
       if (byteData == null) {
         logError(
-            '[flows][combineScreenshots] Failed to convert image to bytes');
+          '[flows][combineScreenshots] Failed to convert image to bytes',
+        );
         throw Exception('Failed to convert image to bytes');
       }
 
@@ -276,7 +280,8 @@ class GoldenScreenshot {
     } catch (e) {
       logError('[flows][combineScreenshots] Error in combineScreenshots: $e');
       logError(
-          '[flows][combineScreenshots] Stack trace: ${StackTrace.current}');
+        '[flows][combineScreenshots] Stack trace: ${StackTrace.current}',
+      );
       rethrow;
     }
   }

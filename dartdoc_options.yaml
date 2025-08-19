@@ -1,0 +1,6 @@
+dartdoc:
+  categories:
+    Configuration:
+      markdown: doc/configuration.md
+      displayName: Configuration
+  categoryOrder: [configuration]
