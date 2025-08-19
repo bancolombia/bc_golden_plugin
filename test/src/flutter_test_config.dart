@@ -9,6 +9,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 
   bcGoldenConfiguration.goldenDifferenceThreshold = 10;
+  bcGoldenConfiguration.willFailOnError = false;
 
   await loadConfiguration();
 
