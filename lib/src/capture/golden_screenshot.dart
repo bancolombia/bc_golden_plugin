@@ -1,3 +1,40 @@
+/// A class that handles capturing and managing golden screenshots.
+///
+/// This class provides functionality to capture screenshots, add them to a collection,
+/// crop images, and combine multiple screenshots into a single image. It also includes
+/// methods for calculating canvas dimensions based on the layout configuration and
+/// positioning images on the canvas.
+///
+/// ## Usage
+/// To use the `GoldenScreenshot` class, create an instance and call its methods
+/// to capture and manage screenshots as needed.
+///
+/// ### Example
+/// ```dart
+/// final goldenScreenshot = GoldenScreenshot();
+/// final screenshot = await goldenScreenshot.captureScreenshot();
+///
+/// goldenScreenshot.add(screenshot);
+///
+/// final combinedImage = await goldenScreenshot.combineScreenshots(
+///  config,
+///  stepNames,
+/// );
+/// ```
+///
+/// ## Methods
+/// - `add(Uint8List screenshot)`: Adds a screenshot to the collection.
+/// - `List<Uint8List> get screenshots`: Retrieves the list of captured screenshots.
+/// - `Future<Uint8List> captureScreenshot()`: Captures a screenshot of the current widget.
+/// - `Future<Uint8List> combineScreenshots(List<Uint8List> screenshots, GoldenFlowConfig config, List<String> stepNames)`: Combines multiple screenshots into a single image.
+///
+/// ## Private Methods
+/// - `Future<ui.Image> _cropImage(ui.Image image, Offset topLeft, Size size)`: Crops the given image to the specified size.
+/// - `Future<ui.Image> _decodeImage(Uint8List bytes)`: Decodes the image from the provided byte data.
+/// - `Size _calculateCanvasDimensions(int screenCount, double screenWidth, double screenHeight, GoldenFlowConfig config)`: Calculates the dimensions of the canvas based on the number of screens and layout configuration.
+/// - `Offset _calculateImagePosition(int index, double screenWidth, double screenHeight, GoldenFlowConfig config)`: Calculates the position of an image on the canvas based on its index and layout configuration.
+library;
+
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -23,6 +60,12 @@ class GoldenScreenshot {
     logDebug(
       '[flows][GoldenScreenshot] Screenshot added, total count: ${_screenshots.length}',
     );
+  }
+
+  void addAll(Iterable<Uint8List> screenshots) {
+    for (final screenshot in screenshots) {
+      add(screenshot);
+    }
   }
 
   List<Uint8List> get screenshots => _screenshots;
@@ -132,7 +175,6 @@ class GoldenScreenshot {
   }
 
   Future<Uint8List> combineScreenshots(
-    List<Uint8List> screenshots,
     GoldenFlowConfig config,
     List<String> stepNames,
   ) async {
@@ -149,7 +191,8 @@ class GoldenScreenshot {
       logDebug(
         '[flows][combineScreenshots] Decoding first image to get dimensions...',
       );
-      final firstImage = await _decodeImage(screenshots.first);
+      final firstImage =
+          await _decodeImage(screenshots.firstOrNull ?? Uint8List(0));
 
       final screenWidth = firstImage.width.toDouble();
       final screenHeight = firstImage.height.toDouble();
@@ -191,17 +234,19 @@ class GoldenScreenshot {
         Paint()..color = Colors.white,
       );
 
-      logDebug('[flows][combineScreenshots] Drawing screenshots on canvas...');
+      logDebug(
+        '[flows][combineScreenshots] Drawing screenshots on canvas...',
+      );
 
-      for (int i = 0; i < screenshots.length; i++) {
+      for (int index = 0; index < screenshots.length; index++) {
         logDebug(
-          '[flows][combineScreenshots] Processing screenshot ${i + 1}/${screenshots.length}',
+          '[flows][combineScreenshots] Processing screenshot ${index + 1}/${screenshots.length}',
         );
 
         try {
-          final image = await _decodeImage(screenshots[i]);
+          final image = await _decodeImage(screenshots[index]);
           final position = _calculateImagePosition(
-            i,
+            index,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
             config,
@@ -224,7 +269,7 @@ class GoldenScreenshot {
 
           _drawStepTitle(
             canvas,
-            stepNames[i],
+            stepNames[index],
             position,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
@@ -241,7 +286,7 @@ class GoldenScreenshot {
           image.dispose();
         } catch (e) {
           logError(
-            '[flows][combineScreenshots] Error processing screenshot $i: $e',
+            '[flows][combineScreenshots] Error processing screenshot $index: $e',
           );
           rethrow;
         }
@@ -263,7 +308,8 @@ class GoldenScreenshot {
 
       if (byteData == null) {
         logError(
-            '[flows][combineScreenshots] Failed to convert image to bytes');
+          '[flows][combineScreenshots] Failed to convert image to bytes',
+        );
         throw Exception('Failed to convert image to bytes');
       }
 
@@ -276,7 +322,8 @@ class GoldenScreenshot {
     } catch (e) {
       logError('[flows][combineScreenshots] Error in combineScreenshots: $e');
       logError(
-          '[flows][combineScreenshots] Stack trace: ${StackTrace.current}');
+        '[flows][combineScreenshots] Stack trace: ${StackTrace.current}',
+      );
       rethrow;
     }
   }

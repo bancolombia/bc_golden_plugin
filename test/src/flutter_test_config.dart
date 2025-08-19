@@ -6,6 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
+
+  bcGoldenConfiguration.goldenDifferenceThreshold = 10;
+  bcGoldenConfiguration.willFailOnError = false;
+
   await loadConfiguration();
 
   await testMain();

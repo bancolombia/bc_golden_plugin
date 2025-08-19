@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
 import '../config/golden_flow_config.dart';
@@ -14,24 +15,33 @@ const String _folderPath = 'goldens';
 /// Function to call the golden test, it replaces the testWigets. This functions
 /// are tagged with 'golden'.
 ///
-/// * [description] A brief description of the test.
-/// * [test] The test itself.
-/// * [shouldUseRealShadows] Whether to render shadows or not.
+/// - [description] A brief description of the test.
+/// - [test] The test itself.
+/// - [shouldUseRealShadows] Whether to render shadows or not.
+/// - [logLevel] The log level for the test, defaulting to `Level.off`.
 @isTest
 void bcGoldenTest(
   String description,
   Future<void> Function(WidgetTester) test, {
   bool shouldUseRealShadows = true,
+  Level logLevel = Level.off,
 }) {
+  setLogLevel(logLevel);
+
   testWidgets(
     description,
     (widgetTester) async {
+      //ignore: always_declare_return_types
       body() async {
+        logDebug('[golden][test] Starting golden test: $description');
+
         final initialDebugDisableShadowsValue = debugDisableShadows;
         debugDisableShadows = !shouldUseRealShadows;
         try {
+          logDebug('[golden][test] Running golden test: $description');
           await test(widgetTester);
         } finally {
+          logDebug('[golden][test] Finished golden test: $description');
           debugDisableShadows = initialDebugDisableShadowsValue;
           debugDefaultTargetPlatformOverride = null;
         }
@@ -54,10 +64,10 @@ void bcGoldenTest(
 /// 5. Compares the combined image against a golden file to ensure visual consistency.
 ///
 /// Parameters:
-/// - [tester]: The widget tester used to interact with the widget tree.
 /// - [description]: A description of the test case.
 /// - [steps]: A list of `FlowStep` objects that define the steps to be executed.
 /// - [config]: A configuration object that contains settings for the golden flow test.
+/// - [logLevel]: The logging level for the test, defaulting to `Level.off`.
 ///
 /// Each `FlowStep` can define:
 /// - `widgetBuilder`: A function that returns the widget to be rendered.
@@ -69,9 +79,11 @@ void bcGoldenTest(
 void goldenFlowTest(
   String description,
   List<FlowStep> steps,
-  GoldenFlowConfig config,
-) {
+  GoldenFlowConfig config, {
+  Level logLevel = Level.off,
+}) {
   final GoldenScreenshot screenshotter = GoldenScreenshot();
+  setLogLevel(logLevel);
 
   testWidgets(description, (tester) async {
     if (config.device != null) {
@@ -136,7 +148,6 @@ void goldenFlowTest(
 
     await tester.runAsync(() async {
       final combinedImage = await screenshotter.combineScreenshots(
-        screenshotter.screenshots,
         config,
         steps.map((s) => s.stepName).toList(),
       );
@@ -210,7 +221,7 @@ Future<void> bcWidgetMatchesImage({
 /// * [name] Name of the configuration.
 /// * [size] The viewport size of the device.
 /// * [pixelDensity] Pixel ratio of the same viewport.
-/// * [targetPlattform] If it's either Android or iOS.
+/// * [targetPlatform] If it's either Android or iOS.
 /// * [safeAreaPadding] Padding used by the device in the safe areas.
 WindowConfigData bcCustomWindowConfigData({
   required name,

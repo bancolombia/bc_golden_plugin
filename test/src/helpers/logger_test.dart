@@ -1,4 +1,4 @@
-// test/logger_test.dart
+// ignore_for_file: missing-test-assertion
 import 'package:bc_golden_plugin/src/helpers/logger.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
@@ -29,52 +29,44 @@ void main() {
     );
   });
 
-  test('logDebug should call Logger.d with the given message', () {
-    logDebug('Test debug');
-    verify(mockLogger.d('Test debug')).called(1);
+  test('log should call Logger.log with the correct parameters', () {
+    const message = 'Test log';
+    final error = Exception('Test error');
+    final stackTrace = StackTrace.current;
+
+    log(Level.info, message, error: error, stackTrace: stackTrace);
+    verify(
+      mockLogger.log(Level.info, message, error: error, stackTrace: stackTrace),
+    ).called(1);
   });
 
-  test('logInfo should call Logger.i with the given message', () {
-    logInfo('Test info');
-    verify(mockLogger.i('Test info')).called(1);
+  test('logDebug should call log with Level.debug', () {
+    const message = 'Debug message';
+    logDebug(message);
+    verify(mockLogger.log(Level.debug, message)).called(1);
   });
 
-  test('logWarning should call Logger.w with the given message', () {
-    logWarning('Test warning');
-    verify(mockLogger.w('Test warning')).called(1);
+  test('logInfo should call log with Level.info', () {
+    const message = 'Info message';
+    logInfo(message);
+    verify(mockLogger.log(Level.info, message)).called(1);
   });
 
-  test('logError should call Logger.e with the given message', () {
-    logError('Test error');
-    verify(mockLogger.e('Test error')).called(1);
+  test('logWarning should call log with Level.warning', () {
+    const message = 'Warning message';
+    logWarning(message);
+    verify(mockLogger.log(Level.warning, message)).called(1);
   });
 
-  test('logVerbose should call Logger.t with the given message', () {
-    logVerbose('Test verbose');
-    verify(mockLogger.t('Test verbose')).called(1);
+  test('logError should call log with Level.error', () {
+    const message = 'Error message';
+    logError(message);
+    verify(mockLogger.log(Level.error, message)).called(1);
   });
 
-  test('logException should call Logger.e with error and stackTrace', () {
-    final error = Exception('Something went wrong');
-    final stack = StackTrace.current;
-    logException(error, stack);
-
-    verify(mockLogger.e(
-      'Exception',
-      error: error,
-      stackTrace: stack,
-    )).called(1);
-  });
-
-  test('logException should call Logger.e without stackTrace if not provided',
-      () {
-    final error = Exception('No stack trace');
-    logException(error);
-
-    verify(mockLogger.e(
-      'Exception',
-      error: error,
-      stackTrace: null,
-    )).called(1);
+  test('logVerbose should call log with Level.trace', () {
+    const message = 'Verbose message';
+    logVerbose(message);
+    verify(mockLogger.log(Level.trace, message)).called(1);
   });
 }

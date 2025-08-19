@@ -37,7 +37,7 @@ void main() {
   }
 
   group('GoldenScreenshot.add', () {
-    test('agrega screenshots válidos y rechaza vacíos', () {
+    test('add valid screenshots and rejects empty ones', () {
       final goldenScreenshot = GoldenScreenshot();
 
       goldenScreenshot.add(Uint8List(0));
@@ -53,7 +53,7 @@ void main() {
 
   group('GoldenScreenshot.captureScreenshot', () {
     testWidgets(
-      'captura una imagen PNG del widget bajo RepaintBoundary',
+      'captures a PNG image from RepaintBoundary widget.',
       (tester) async {
         await tester.runAsync(() async {
           final goldenScreenshot = GoldenScreenshot();
@@ -104,7 +104,7 @@ void main() {
           await _pngOf(width: 100, height: 180, color: const Color(0xFF0000FF));
     });
 
-    test('lanza ArgumentError si la lista está vacía', () async {
+    test('throws ArgumentError if the list is empty.', () async {
       final goldenScreenshot = GoldenScreenshot();
 
       const config = GoldenFlowConfig(
@@ -115,13 +115,19 @@ void main() {
       );
 
       expect(
-        () => goldenScreenshot.combineScreenshots([], config, []),
+        () => goldenScreenshot.combineScreenshots(config, []),
         throwsA(isA<ArgumentError>()),
       );
     });
 
-    test('combina en layout vertical', () async {
+    test('combines in vertical layout', () async {
       final goldenScreenshot = GoldenScreenshot();
+
+      goldenScreenshot.addAll([
+        shotA,
+        shotB,
+      ]);
+
       const config = GoldenFlowConfig(
         testName: 'Test',
         layoutType: FlowLayoutType.vertical,
@@ -130,7 +136,6 @@ void main() {
       );
 
       final combined = await goldenScreenshot.combineScreenshots(
-        [shotA, shotB],
         config,
         ['Step A', 'Step B'],
       );
@@ -143,8 +148,15 @@ void main() {
       img.dispose();
     });
 
-    test('combina en layout horizontal', () async {
+    test('combines in horizontal layout', () async {
       final goldenScreenshot = GoldenScreenshot();
+
+      goldenScreenshot.addAll([
+        shotA,
+        shotB,
+        shotC,
+      ]);
+
       const config = GoldenFlowConfig(
         testName: 'Test',
         layoutType: FlowLayoutType.horizontal,
@@ -153,7 +165,6 @@ void main() {
       );
 
       final combined = await goldenScreenshot.combineScreenshots(
-        [shotA, shotB, shotC],
         config,
         ['A', 'B', 'C'],
       );
@@ -165,8 +176,15 @@ void main() {
       img.dispose();
     });
 
-    test('combina en layout grid con maxScreensPerRow', () async {
+    test('combines in grid layout with maxScreensPerRow', () async {
       final goldenScreenshot = GoldenScreenshot();
+
+      goldenScreenshot.addAll([
+        shotA,
+        shotB,
+        shotC,
+      ]);
+
       const config = GoldenFlowConfig(
         testName: 'Test',
         layoutType: FlowLayoutType.grid,
@@ -175,7 +193,6 @@ void main() {
       );
 
       final combined = await goldenScreenshot.combineScreenshots(
-        [shotA, shotB, shotC],
         config,
         ['1', '2', '3'],
       );
@@ -187,11 +204,10 @@ void main() {
       img.dispose();
     });
 
-    test('respeta límite de canvas y escala si excede', () async {
+    test('respects canvas limit and expands if needed', () async {
       final goldenScreenshot = GoldenScreenshot();
-      final many = <Uint8List>[];
       for (int i = 0; i < 30; i++) {
-        many.add(await _pngOf(width: 800, height: 1200));
+        goldenScreenshot.add(await _pngOf(width: 800, height: 1200));
       }
 
       const config = GoldenFlowConfig(
@@ -200,10 +216,12 @@ void main() {
         spacing: 16,
         maxScreensPerRow: 2,
       );
-      final names = List<String>.generate(many.length, (i) => 'Step ${i + 1}');
+      final names = List<String>.generate(
+        goldenScreenshot.screenshots.length,
+        (i) => 'Step ${i + 1}',
+      );
 
-      final combined =
-          await goldenScreenshot.combineScreenshots(many, config, names);
+      final combined = await goldenScreenshot.combineScreenshots(config, names);
       final img = await _decode(combined);
 
       expect(img.width, lessThanOrEqualTo(4096));
@@ -212,9 +230,15 @@ void main() {
     });
 
     test(
-      'falla si stepNames no coincide con cantidad de screenshots (por RangeError)',
+      'fails if stepnames list is shorter than screenshots',
       () async {
         final goldenScreenshot = GoldenScreenshot();
+
+        goldenScreenshot.addAll([
+          shotA,
+          shotB,
+        ]);
+
         const config = GoldenFlowConfig(
           testName: 'Test',
           layoutType: FlowLayoutType.vertical,
@@ -224,7 +248,6 @@ void main() {
 
         expect(
           () => goldenScreenshot.combineScreenshots(
-            [shotA, shotB],
             config,
             ['Only one'],
           ),

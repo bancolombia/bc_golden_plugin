@@ -3,6 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/helpers.dart';
 
+/// ## GoldenFlowConfig
+/// Configuration class for golden flow tests.
+/// This class allows you to define the parameters for a series of golden tests,
+/// including the test name, delay between screens, layout type, maximum screens per row,
+/// spacing, and device configuration.
+/// * [testName] The name of the test, used to identify the golden file.
+/// * [delayBetweenScreens] The delay between rendering each screen in the flow.
+/// * [layoutType] The layout type for displaying the screens in the flow.
+///   - `vertical`: Screens are displayed vertically.
+///   - `horizontal`: Screens are displayed horizontally.
+///   - `grid`: Screens are displayed in a grid layout.
+/// * [maxScreensPerRow] The maximum number of screens to display per row in grid layout.
+/// * [spacing] The spacing between screens in the flow.
+/// * [device] Optional device configuration for the golden test.
+/// {@category Configuration}
 class GoldenFlowConfig {
   const GoldenFlowConfig({
     required this.testName,
@@ -27,6 +42,18 @@ enum FlowLayoutType {
   grid,
 }
 
+/// ## FlowStep
+/// Represents a single step in a golden flow test.
+///
+/// This class encapsulates the details of each step, including the widget to be rendered,
+/// the name of the step, and optional setup and verification actions.
+/// * [stepName] The name of the step, used for identification in the flow.
+/// * [widgetBuilder] A function that returns the widget to be rendered for this step.
+/// * [setupAction] An optional function to perform setup actions before capturing the screenshot.
+/// * [verifyAction] An optional function to perform verification actions after rendering the widget.
+///
+/// The `FlowStep` class is used in conjunction with the `goldenFlowTest` function to create a series of golden tests.
+/// {@category Configuration}
 class FlowStep {
   const FlowStep({
     required this.stepName,
