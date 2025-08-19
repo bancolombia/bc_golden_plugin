@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
 import '../config/golden_flow_config.dart';
@@ -14,25 +15,33 @@ const String _folderPath = 'goldens';
 /// Function to call the golden test, it replaces the testWigets. This functions
 /// are tagged with 'golden'.
 ///
-/// * [description] A brief description of the test.
-/// * [test] The test itself.
-/// * [shouldUseRealShadows] Whether to render shadows or not.
+/// - [description] A brief description of the test.
+/// - [test] The test itself.
+/// - [shouldUseRealShadows] Whether to render shadows or not.
+/// - [logLevel] The log level for the test, defaulting to `Level.off`.
 @isTest
 void bcGoldenTest(
   String description,
   Future<void> Function(WidgetTester) test, {
   bool shouldUseRealShadows = true,
+  Level logLevel = Level.off,
 }) {
+  setLogLevel(logLevel);
+
   testWidgets(
     description,
     (widgetTester) async {
       //ignore: always_declare_return_types
       body() async {
+        logDebug('[golden][test] Starting golden test: $description');
+
         final initialDebugDisableShadowsValue = debugDisableShadows;
         debugDisableShadows = !shouldUseRealShadows;
         try {
+          logDebug('[golden][test] Running golden test: $description');
           await test(widgetTester);
         } finally {
+          logDebug('[golden][test] Finished golden test: $description');
           debugDisableShadows = initialDebugDisableShadowsValue;
           debugDefaultTargetPlatformOverride = null;
         }
@@ -58,6 +67,7 @@ void bcGoldenTest(
 /// - [description]: A description of the test case.
 /// - [steps]: A list of `FlowStep` objects that define the steps to be executed.
 /// - [config]: A configuration object that contains settings for the golden flow test.
+/// - [logLevel]: The logging level for the test, defaulting to `Level.off`.
 ///
 /// Each `FlowStep` can define:
 /// - `widgetBuilder`: A function that returns the widget to be rendered.
@@ -69,9 +79,11 @@ void bcGoldenTest(
 void goldenFlowTest(
   String description,
   List<FlowStep> steps,
-  GoldenFlowConfig config,
-) {
+  GoldenFlowConfig config, {
+  Level logLevel = Level.off,
+}) {
   final GoldenScreenshot screenshotter = GoldenScreenshot();
+  setLogLevel(logLevel);
 
   testWidgets(description, (tester) async {
     if (config.device != null) {

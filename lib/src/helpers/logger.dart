@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
 var logger = Logger(
-  level: kDebugMode ? Level.debug : Level.info,
+  level: Level.debug,
   printer: PrettyPrinter(
     methodCount: 0,
     errorMethodCount: 5,
@@ -11,6 +10,19 @@ var logger = Logger(
     printEmojis: true,
   ),
 );
+
+void setLogLevel(Level level) {
+  logger = Logger(
+    level: level,
+    printer: PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 5,
+      lineLength: 50,
+      colors: true,
+      printEmojis: true,
+    ),
+  );
+}
 
 void logDebug(String message) {
   logger.d(message);
