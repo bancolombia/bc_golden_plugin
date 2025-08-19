@@ -34,6 +34,7 @@ dev_dependencies:
   dart_code_linter: ^3.0.0
   mockito: ^5.5.0
   build_runner: ^2.4.15
+  image: ^4.5.4
 
 
 flutter:

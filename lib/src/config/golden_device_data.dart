@@ -3,6 +3,13 @@ import 'package:flutter/painting.dart';
 
 import '../testkit/window_size.dart';
 
+/// A class that represents the configuration data for golden device testing.
+///
+/// This class is used to store and manage the device-specific data
+/// required for golden tests in the application. It may include
+/// properties such as device name, screen size, pixel density, and
+/// other relevant information that helps in rendering the UI
+/// accurately for different devices.
 class GoldenDeviceData {
   GoldenDeviceData._();
 

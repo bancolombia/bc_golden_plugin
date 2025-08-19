@@ -80,6 +80,6 @@ void main() {
       ),
     ];
 
-    // goldenFlowTest('renders flow and matches golden', steps, config);
+    goldenFlowTest('renders flow and matches golden', steps, config);
   });
 }
