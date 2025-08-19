@@ -27,7 +27,7 @@ void main() {
         imageName: 'golden_iphone_14_pro',
         widget: const HomePage(title: 'Flutter Demo Home Page'),
         tester: tester,
-        device: iPhone14ProMax,
+        device: GoldenDeviceData.iPhone16ProMax,
         textScaleFactor: 3.0,
       );
     },
@@ -62,7 +62,7 @@ void main() {
     ],
     GoldenFlowConfig(
       testName: 'multiple_screens',
-      device: iPhone13,
+      device: GoldenDeviceData.galaxyS25,
       spacing: 100,
     ),
   );
