@@ -80,6 +80,15 @@ class MockGoldenScreenshot extends _i1.Mock implements _i4.GoldenScreenshot {
       );
 
   @override
+  void addAll(Iterable<_i5.Uint8List>? screenshots) => super.noSuchMethod(
+        Invocation.method(
+          #addAll,
+          [screenshots],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   _i6.Future<_i5.Uint8List> captureScreenshot() => (super.noSuchMethod(
         Invocation.method(
           #captureScreenshot,
@@ -92,7 +101,6 @@ class MockGoldenScreenshot extends _i1.Mock implements _i4.GoldenScreenshot {
 
   @override
   _i6.Future<_i5.Uint8List> combineScreenshots(
-    List<_i5.Uint8List>? screenshots,
     _i7.GoldenFlowConfig? config,
     List<String>? stepNames,
   ) =>
@@ -100,7 +108,6 @@ class MockGoldenScreenshot extends _i1.Mock implements _i4.GoldenScreenshot {
         Invocation.method(
           #combineScreenshots,
           [
-            screenshots,
             config,
             stepNames,
           ],

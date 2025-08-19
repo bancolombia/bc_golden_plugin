@@ -1,53 +1,37 @@
 import 'package:logger/logger.dart';
 
-var logger = Logger(
+final LogPrinter _prettyPrinter = PrettyPrinter(
+  methodCount: 0,
+  errorMethodCount: 5,
+  lineLength: 50,
+  colors: true,
+  printEmojis: true,
+);
+
+Logger logger = Logger(
   level: Level.debug,
-  printer: PrettyPrinter(
-    methodCount: 0,
-    errorMethodCount: 5,
-    lineLength: 50,
-    colors: true,
-    printEmojis: true,
-  ),
+  printer: _prettyPrinter,
 );
 
 void setLogLevel(Level level) {
-  logger = Logger(
-    level: level,
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 50,
-      colors: true,
-      printEmojis: true,
-    ),
-  );
+  logger = Logger(level: level, printer: _prettyPrinter);
 }
 
-void logDebug(String message) {
-  logger.d(message);
+void log(
+  Level level,
+  String message, {
+  Object? error,
+  StackTrace? stackTrace,
+}) {
+  logger.log(level, message, error: error, stackTrace: stackTrace);
 }
 
-void logInfo(String message) {
-  logger.i(message);
-}
-
-void logWarning(String message) {
-  logger.w(message);
-}
-
-void logError(String message) {
-  logger.e(message);
-}
-
-void logVerbose(String message) {
-  logger.t(message);
-}
+void logDebug(String message) => log(Level.debug, message);
+void logInfo(String message) => log(Level.info, message);
+void logWarning(String message) => log(Level.warning, message);
+void logError(String message) => log(Level.error, message);
+void logVerbose(String message) => log(Level.trace, message);
 
 void logException(Object error, [StackTrace? stackTrace]) {
-  logger.e(
-    'Exception',
-    stackTrace: stackTrace,
-    error: error,
-  );
+  log(Level.error, 'Exception', error: error, stackTrace: stackTrace);
 }

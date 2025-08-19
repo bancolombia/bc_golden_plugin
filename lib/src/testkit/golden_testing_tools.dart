@@ -148,7 +148,6 @@ void goldenFlowTest(
 
     await tester.runAsync(() async {
       final combinedImage = await screenshotter.combineScreenshots(
-        screenshotter.screenshots,
         config,
         steps.map((s) => s.stepName).toList(),
       );
