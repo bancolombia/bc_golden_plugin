@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<Uint8List> _pngOf({
+  Future<Uint8List> pngOf({
     required int width,
     required int height,
     Color color = const Color(0xFF00FF00),
@@ -26,10 +26,13 @@ void main() {
     img.dispose();
     picture.dispose();
 
-    return byteData!.buffer.asUint8List();
+    if (byteData == null) {
+      throw Exception('Failed to convert image to PNG');
+    }
+    return byteData.buffer.asUint8List();
   }
 
-  Future<ui.Image> _decode(Uint8List png) async {
+  Future<ui.Image> decode(Uint8List png) async {
     final codec = await ui.instantiateImageCodec(png);
     final frame = await codec.getNextFrame();
 
@@ -81,7 +84,7 @@ void main() {
           final bytes = await goldenScreenshot.captureScreenshot();
           expect(bytes, isNotEmpty);
 
-          final img = await _decode(bytes);
+          final img = await decode(bytes);
           expect(img.width, equals(size.width.toInt()));
           expect(img.height, equals(size.height.toInt()));
           img.dispose();
@@ -97,11 +100,11 @@ void main() {
 
     setUp(() async {
       shotA =
-          await _pngOf(width: 100, height: 180, color: const Color(0xFFFF0000));
+          await pngOf(width: 100, height: 180, color: const Color(0xFFFF0000));
       shotB =
-          await _pngOf(width: 100, height: 180, color: const Color(0xFF00FF00));
+          await pngOf(width: 100, height: 180, color: const Color(0xFF00FF00));
       shotC =
-          await _pngOf(width: 100, height: 180, color: const Color(0xFF0000FF));
+          await pngOf(width: 100, height: 180, color: const Color(0xFF0000FF));
     });
 
     test('throws ArgumentError if the list is empty.', () async {
@@ -142,7 +145,7 @@ void main() {
 
       expect(combined, isNotEmpty);
 
-      final img = await _decode(combined);
+      final img = await decode(combined);
       expect(img.width, greaterThanOrEqualTo(100));
       expect(img.height, greaterThan(2 * (180 + 40 + 8) + 20 - 1));
       img.dispose();
@@ -169,7 +172,7 @@ void main() {
         ['A', 'B', 'C'],
       );
 
-      final img = await _decode(combined);
+      final img = await decode(combined);
 
       expect(img.width, greaterThan(3 * 100 + 24 - 1));
       expect(img.height, greaterThanOrEqualTo(180 + 40 + 40));
@@ -197,7 +200,7 @@ void main() {
         ['1', '2', '3'],
       );
 
-      final img = await _decode(combined);
+      final img = await decode(combined);
 
       expect(img.width, greaterThanOrEqualTo(2 * 100 + 10 + 20));
       expect(img.height, greaterThanOrEqualTo(2 * (180 + 40) + 10 + 20));
@@ -207,7 +210,7 @@ void main() {
     test('respects canvas limit and expands if needed', () async {
       final goldenScreenshot = GoldenScreenshot();
       for (int i = 0; i < 30; i++) {
-        goldenScreenshot.add(await _pngOf(width: 800, height: 1200));
+        goldenScreenshot.add(await pngOf(width: 800, height: 1200));
       }
 
       const config = GoldenFlowConfig(
@@ -222,7 +225,7 @@ void main() {
       );
 
       final combined = await goldenScreenshot.combineScreenshots(config, names);
-      final img = await _decode(combined);
+      final img = await decode(combined);
 
       expect(img.width, lessThanOrEqualTo(4096));
       expect(img.height, lessThanOrEqualTo(4096));

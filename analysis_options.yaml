@@ -18,7 +18,6 @@ linter:
     comment_references: false
     one_member_abstracts: false
     only_throw_errors: true
-    package_api_docs: true
     prefer_single_quotes: true
     sort_child_properties_last: true
     camel_case_types: true
