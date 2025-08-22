@@ -12,17 +12,23 @@ import 'package:platform/platform.dart';
 /// e.g. [awaitImages].
 extension AssetLoader on WidgetTester {
   /// Pauses test until images are ready to be rendered.
-  Future<void> awaitImages() async {
+  /// 
+  /// [timeout] The timeout for pumpAndSettle operations. If null, uses the default timeout.
+  /// [duration] The duration for pump operations. If null, uses the default duration.
+  Future<void> awaitImages({
+    Duration? timeout,
+    Duration? duration,
+  }) async {
     await runAsync(() async {
       for (final element in find.byType(Image).evaluate()) {
         final widget = element.widget as Image;
         final image = widget.image;
         if (image is SvgPicture) {
           await pumpWidget(image as SvgPicture);
-          await pumpAndSettle();
+          await pumpAndSettle(timeout: timeout, duration: duration);
         } else {
           await precacheImage(image, element);
-          await pumpAndSettle();
+          await pumpAndSettle(timeout: timeout, duration: duration);
         }
       }
 
@@ -33,10 +39,10 @@ extension AssetLoader on WidgetTester {
           final image = decoration.image?.image;
           if (image is SvgPicture) {
             await pumpWidget(image as SvgPicture);
-            await pumpAndSettle();
+            await pumpAndSettle(timeout: timeout, duration: duration);
           } else if (image != null) {
             await precacheImage(image, element);
-            await pumpAndSettle();
+            await pumpAndSettle(timeout: timeout, duration: duration);
           }
         }
       }

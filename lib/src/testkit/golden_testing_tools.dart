@@ -68,6 +68,10 @@ void bcGoldenTest(
 /// - [steps]: A list of `FlowStep` objects that define the steps to be executed.
 /// - [config]: A configuration object that contains settings for the golden flow test.
 /// - [logLevel]: The logging level for the test, defaulting to `Level.off`.
+/// - [pumpAndSettleTimeout]: Optional timeout for pumpAndSettle operations
+///   when loading images. If null, uses the default timeout.
+/// - [pumpDuration]: Optional duration for pump operations when loading
+///   images. If null, uses the default duration.
 ///
 /// Each `FlowStep` can define:
 /// - `widgetBuilder`: A function that returns the widget to be rendered.
@@ -81,6 +85,8 @@ void goldenFlowTest(
   List<FlowStep> steps,
   GoldenFlowConfig config, {
   Level logLevel = Level.off,
+  Duration? pumpAndSettleTimeout,
+  Duration? pumpDuration,
 }) {
   final GoldenScreenshot screenshotter = GoldenScreenshot();
   setLogLevel(logLevel);
@@ -92,7 +98,10 @@ void goldenFlowTest(
 
     await loadAppFonts();
 
-    await tester.awaitImages();
+    await tester.awaitImages(
+      timeout: pumpAndSettleTimeout,
+      duration: pumpDuration,
+    );
 
     for (int index = 0; index < steps.length; index++) {
       final step = steps[index];
@@ -176,6 +185,10 @@ void goldenFlowTest(
 /// test with phone screen specifications.
 /// * [customTheme] (optional) if set, it will override the default theme
 /// given in the BcGoldenConfiguration for one test only.
+/// * [pumpAndSettleTimeout] (optional) timeout for pumpAndSettle operations
+/// when loading images. If null, uses the default timeout.
+/// * [pumpDuration] (optional) duration for pump operations when loading
+/// images. If null, uses the default duration.
 Future<void> bcWidgetMatchesImage({
   required String imageName,
   required Widget widget,
@@ -185,6 +198,8 @@ Future<void> bcWidgetMatchesImage({
   double? textScaleFactor,
   WindowConfigData? device,
   ThemeData? customTheme,
+  Duration? pumpAndSettleTimeout,
+  Duration? pumpDuration,
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
@@ -204,7 +219,10 @@ Future<void> bcWidgetMatchesImage({
     ),
   );
 
-  await tester.awaitImages();
+  await tester.awaitImages(
+    timeout: pumpAndSettleTimeout,
+    duration: pumpDuration,
+  );
 
   await loadAppFonts();
 

@@ -66,4 +66,44 @@ void main() {
       spacing: 100,
     ),
   );
+
+  // Example demonstrating the new timeout parameters for complex animations
+  bcGoldenTest(
+    'Test with custom timeout for animations',
+    (tester) async {
+      await bcWidgetMatchesImage(
+        imageName: 'animation_test',
+        widget: const HomePage(title: 'Animated Page'),
+        tester: tester,
+        device: GoldenDeviceData.iPhone16ProMax,
+        // Custom timeout to handle long-running animations
+        pumpAndSettleTimeout: const Duration(seconds: 30),
+        // Faster pump duration for quicker animation steps
+        pumpDuration: const Duration(milliseconds: 50),
+      );
+    },
+    shouldUseRealShadows: true,
+  );
+
+  goldenFlowTest(
+    'Flow test with timeout control',
+    [
+      FlowStep(
+        stepName: 'animated_home',
+        widgetBuilder: () => const HomePage(title: 'Animated Demo'),
+      ),
+      FlowStep(
+        stepName: 'animated_second',
+        widgetBuilder: () => const HomePage(title: 'Second Animated Page'),
+      ),
+    ],
+    GoldenFlowConfig(
+      testName: 'animated_flow',
+      device: GoldenDeviceData.galaxyS25,
+      spacing: 50,
+    ),
+    // Custom timeout parameters for the entire flow
+    pumpAndSettleTimeout: const Duration(seconds: 15),
+    pumpDuration: const Duration(milliseconds: 100),
+  );
 }

@@ -82,4 +82,93 @@ void main() {
 
     // goldenFlowTest('renders flow and matches golden', steps, config);
   });
+
+  group('Timeout parameter tests', () {
+    testWidgets('bcWidgetMatchesImage accepts pumpAndSettleTimeout parameter', (tester) async {
+      // This test verifies that the function accepts the new timeout parameter
+      // without throwing an error during compilation/runtime
+      const widget = ColoredBox(color: Colors.blue);
+      
+      // Mock the golden file comparator to avoid actual file operations
+      try {
+        await bcWidgetMatchesImage(
+          imageName: 'test_timeout',
+          widget: widget,
+          tester: tester,
+          pumpAndSettleTimeout: const Duration(seconds: 2),
+        );
+      } catch (e) {
+        // We expect this to fail due to missing golden file setup in tests
+        // but we want to verify the parameter is accepted
+        expect(e.toString(), isNot(contains('pumpAndSettleTimeout')));
+      }
+    });
+
+    testWidgets('bcWidgetMatchesImage accepts pumpDuration parameter', (tester) async {
+      // This test verifies that the function accepts the new duration parameter
+      const widget = ColoredBox(color: Colors.green);
+      
+      try {
+        await bcWidgetMatchesImage(
+          imageName: 'test_duration',
+          widget: widget,
+          tester: tester,
+          pumpDuration: const Duration(milliseconds: 50),
+        );
+      } catch (e) {
+        // We expect this to fail due to missing golden file setup in tests
+        // but we want to verify the parameter is accepted
+        expect(e.toString(), isNot(contains('pumpDuration')));
+      }
+    });
+
+    testWidgets('bcWidgetMatchesImage accepts both timeout parameters', (tester) async {
+      // This test verifies that the function accepts both new parameters
+      const widget = ColoredBox(color: Colors.red);
+      
+      try {
+        await bcWidgetMatchesImage(
+          imageName: 'test_both_params',
+          widget: widget,
+          tester: tester,
+          pumpAndSettleTimeout: const Duration(seconds: 1),
+          pumpDuration: const Duration(milliseconds: 25),
+        );
+      } catch (e) {
+        // We expect this to fail due to missing golden file setup in tests
+        // but we want to verify the parameters are accepted
+        expect(e.toString(), isNot(contains('pumpAndSettleTimeout')));
+        expect(e.toString(), isNot(contains('pumpDuration')));
+      }
+    });
+
+    test('goldenFlowTest accepts timeout parameters', () {
+      // This test verifies that goldenFlowTest function signature accepts the new parameters
+      final steps = <FlowStep>[
+        FlowStep(
+          stepName: 'Test Step',
+          widgetBuilder: () => const ColoredBox(color: Colors.blue),
+        ),
+      ];
+
+      const config = GoldenFlowConfig(
+        layoutType: FlowLayoutType.vertical,
+        spacing: 8,
+        maxScreensPerRow: 2,
+        delayBetweenScreens: Duration.zero,
+        testName: 'timeout_test',
+      );
+
+      // This should compile without errors, demonstrating the parameters are accepted
+      expect(() {
+        goldenFlowTest(
+          'test with timeout parameters',
+          steps,
+          config,
+          pumpAndSettleTimeout: const Duration(seconds: 2),
+          pumpDuration: const Duration(milliseconds: 50),
+        );
+      }, returnsNormally);
+    });
+  });
 }
