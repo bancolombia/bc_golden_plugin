@@ -221,3 +221,60 @@ bcGoldenTest(
   );
 ```
 This will generate the golden and will make the comparison between the given image and the widget developed.
+
+## Handling Animations and Timeout Control 🎬
+
+When testing widgets with complex animations or long-running operations, you may encounter "PumpAndSettle timed out" exceptions. The `bc_golden_plugin` provides timeout control parameters to handle these scenarios:
+
+### Custom Timeout for Single Widget Tests
+
+```dart
+bcGoldenTest(
+    'animated_widget_test',
+    (tester) async {
+      await bcWidgetMatchesImage(
+        imageName: 'animated_widget',
+        widget: MyAnimatedWidget(),
+        tester: tester,
+        device: iPhone8,
+        // Custom timeout for long animations
+        pumpAndSettleTimeout: const Duration(seconds: 30),
+        // Faster pump duration for smoother animation testing
+        pumpDuration: const Duration(milliseconds: 50),
+      );
+    },
+    shouldUseRealShadows: true,
+  );
+```
+
+### Custom Timeout for Flow Tests
+
+```dart
+goldenFlowTest(
+  'animated_flow_test',
+  [
+    FlowStep(
+      stepName: 'step1',
+      widgetBuilder: () => MyAnimatedScreen1(),
+    ),
+    FlowStep(
+      stepName: 'step2', 
+      widgetBuilder: () => MyAnimatedScreen2(),
+    ),
+  ],
+  GoldenFlowConfig(
+    testName: 'animated_flow',
+    device: iPhone14Pro,
+  ),
+  // Apply timeout settings to the entire flow
+  pumpAndSettleTimeout: const Duration(seconds: 20),
+  pumpDuration: const Duration(milliseconds: 100),
+);
+```
+
+### Parameters
+
+- **`pumpAndSettleTimeout`**: Maximum time to wait for animations to settle. Useful for long-running or infinite animations.
+- **`pumpDuration`**: Duration between animation frames during pumping. Smaller values can help with smoother animation testing.
+
+These parameters provide a migration path for users coming from `golden_toolkit` who used the `customPump` parameter.
