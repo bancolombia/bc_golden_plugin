@@ -160,6 +160,11 @@ class BcGoldenCapture {
 
         logDebug('[flows][multiple] ✓ Combined screenshots successfully.');
 
+        final testPath =
+            (goldenFileComparator as LocalFileComparator).basedir.path;
+
+        await localFileComparator(testPath);
+
         await expectLater(
           combinedImage,
           matchesGoldenFile('goldens/${config.testName}_flow.png'),
