@@ -2,14 +2,14 @@
 
 This guide explains how to migrate from the legacy `bcGoldenTest` function to the new unified `BcGoldenCapture` class.
 
-#### Class Rename: GoldenFlowC## Notes
+## Notes
 
 - All existing parameters and functionality remain the same
 - `FlowStep` class has been renamed to `GoldenStep` for better clarity
 - The new API provides better IntelliSense and documentation
-- Logging messages now include `.single` or `.multiple` context for better debugging→ GoldenCaptureConfig
+- Logging messages now include `.single` or `.multiple` context for better debugging
 
-The `GoldenFlowConfig` class has been renamed to `GoldenCaptureConfig` and `FlowLayoutType` to `CaptureLayoutType` for better semantic consistency:erview
+The `GoldenFlowConfig` class has been renamed to `GoldenCaptureConfig` and `FlowLayoutType` to `CaptureLayoutType` for better semantic consistency.
 
 The new `BcGoldenCapture` class provides a unified API for both single widget captures and multi-step flow captures, replacing the previous `bcGoldenTest` function with a more consistent and maintainable approach.
 
@@ -167,7 +167,7 @@ GoldenStep(
 
 All functionality remains exactly the same - only the class name has changed.
 
-## � Class Rename: GoldenFlowConfig → GoldenCaptureConfig
+## Class Rename: GoldenFlowConfig → GoldenCaptureConfig
 
 The `GoldenFlowConfig` class has been renamed to `GoldenCaptureConfig` and `FlowLayoutType` to `CaptureLayoutType` for better semantic consistency:
 
@@ -193,7 +193,7 @@ BcGoldenCapture.multiple('test', steps,
 
 All configuration options and functionality remain exactly the same - only the class and enum names have changed.
 
-## �📝 Notes
+## Notes
 
 - All existing parameters and functionality remain the same
 - `FlowStep` class has been renamed to `GoldenStep` for better clarity
