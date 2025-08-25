@@ -365,6 +365,58 @@ BcGoldenCapture.multiple(
 );
 ```
 
+### Manual Golden Test Example
+
+You can also use `GoldenScreenshot` manually, so you are freely to choose
+when to capture a screenshot and still have control of your widget:
+
+```dart
+testWidgets('Manual golden test', (tester) async {
+    await tester.runAsync(() async {
+      GoldenScreenshot screenshotter = GoldenScreenshot();
+
+      tester.configureWindow(
+        GoldenDeviceData.iPhone13,
+      );
+
+      await tester.pumpWidget(
+        TestBase.appGoldenTest(
+          widget: const HomePage(title: 'Flutter Demo Home Page'),
+          key: GlobalKey(),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await screenshotter.captureScreenshot();
+
+      await tester.tap( // Navigate to other screen
+        find.byKey(
+          const Key('button_widget_key'),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await screenshotter.captureScreenshot();
+
+      final combinedScreenshot = await screenshotter.combineScreenshots(
+        GoldenCaptureConfig(
+          testName: 'manual_golden',
+          device: GoldenDeviceData.iPhone13,
+          layoutType: CaptureLayoutType.horizontal,
+        ),
+        ['home', 'another'],
+      );
+
+      await expectLater(
+        combinedScreenshot,
+        matchesGoldenFile('goldens/manual_golden.png'),
+      );
+    });
+  });
+```
+
 ### Legacy API (Deprecated)
 
 The legacy `bcGoldenTest` function is still supported but deprecated:
@@ -384,7 +436,3 @@ bcGoldenTest(
     shouldUseRealShadows: true,
   );
 ```
-
-## Migration Guide
-
-For detailed migration instructions from the legacy API to the new `BcGoldenCapture` class, see the [API Migration Guide](doc/api_migration.md).
