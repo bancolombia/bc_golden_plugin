@@ -416,6 +416,7 @@ class GoldenScreenshot {
           color: Colors.black87,
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
+          fontFamily: 'Roboto-Regular',
         ),
       ),
       textDirection: TextDirection.ltr,
