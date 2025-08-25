@@ -20,3 +20,14 @@ jobs:
         run: flutter pub get
       - name: Run tests
         run: flutter test
+      - name: Upload golden failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures-${{ github.run_id }}
+          path: |
+            **/failures/**
+            test/**/failures/**
+            packages/**/test/**/failures/**
+          if-no-files-found: ignore
+          retention-days: 7
