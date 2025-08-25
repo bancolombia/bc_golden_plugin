@@ -1,5 +1,7 @@
+import 'package:example/src/presentation/home/widgets/button_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../another_page/another_page.dart';
 import 'widgets/image_loader_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,11 +28,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ImageLoaderWidget(),
+            const ImageLoaderWidget(),
+            ButtonWidget(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AnotherPage(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

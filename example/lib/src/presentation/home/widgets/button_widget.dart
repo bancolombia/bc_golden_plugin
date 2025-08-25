@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatelessWidget {
-  const ButtonWidget({super.key});
+  const ButtonWidget({
+    super.key,
+    this.onPressed,
+  });
+
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(elevation: WidgetStateProperty.all(10)),
-      onPressed: () {},
+      onPressed: onPressed ?? () {},
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
