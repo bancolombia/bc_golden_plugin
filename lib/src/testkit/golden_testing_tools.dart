@@ -87,6 +87,7 @@ class BcGoldenCapture {
     List<GoldenStep> steps,
     GoldenCaptureConfig config, {
     Level logLevel = Level.off,
+    bool shouldUseRealShadows = true,
   }) {
     final GoldenScreenshot screenshotter = GoldenScreenshot();
     setLogLevel(logLevel);
@@ -100,57 +101,62 @@ class BcGoldenCapture {
 
       await tester.awaitImages();
 
-      for (int index = 0; index < steps.length; index++) {
-        final step = steps[index];
+      final initialDebugDisableShadowsValue = debugDisableShadows;
+      debugDisableShadows = !shouldUseRealShadows;
 
-        logDebug(
-          '[flows][multiple] Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
-        );
+      try {
+        for (int index = 0; index < steps.length; index++) {
+          final step = steps[index];
 
-        await tester.pumpWidget(
-          TestBase.appGoldenTest(
-            widget: step.widgetBuilder(),
-            key: GlobalKey(),
-          ),
-        );
-
-        logDebug(
-          '[flows][multiple] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
-        );
-
-        if (step.setupAction != null) {
-          await step.setupAction!(tester);
-        }
-
-        logDebug(
-          '[flows][multiple] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
-        );
-
-        await tester.pumpAndSettle();
-
-        if (index > 0) {
-          await tester.pump(config.delayBetweenScreens);
-        }
-
-        if (step.verifyAction != null) {
-          await step.verifyAction!(tester);
-        }
-
-        logDebug(
-          '[flows][multiple] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
-        );
-
-        await tester.runAsync(() async {
-          final screenshot = await screenshotter.captureScreenshot();
           logDebug(
-            '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+            '[flows][multiple] Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
           );
 
-          screenshotter.add(screenshot);
-        });
-      }
+          await tester.pumpWidget(
+            TestBase.appGoldenTest(
+              widget: step.widgetBuilder(),
+              key: GlobalKey(),
+            ),
+          );
 
-      logDebug('[flows][multiple] Combining screenshots...');
+          logDebug(
+            '[flows][multiple] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
+          );
+
+          if (step.setupAction != null) {
+            await step.setupAction!(tester);
+          }
+
+          logDebug(
+            '[flows][multiple] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+          );
+
+          await tester.pumpAndSettle();
+
+          if (index > 0) {
+            await tester.pump(config.delayBetweenScreens);
+          }
+
+          if (step.verifyAction != null) {
+            await step.verifyAction!(tester);
+          }
+
+          logDebug(
+            '[flows][multiple] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+          );
+
+          await tester.runAsync(() async {
+            await screenshotter.captureScreenshot();
+            logDebug(
+              '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+            );
+          });
+        }
+
+        logDebug('[flows][multiple] Combining screenshots...');
+      } finally {
+        debugDisableShadows = initialDebugDisableShadowsValue;
+      }
 
       await tester.runAsync(() async {
         final combinedImage = await screenshotter.combineScreenshots(

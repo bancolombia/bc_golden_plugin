@@ -11,6 +11,7 @@ class ButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      key: const Key('button_widget_key'),
       style: ButtonStyle(elevation: WidgetStateProperty.all(10)),
       onPressed: onPressed ?? () {},
       child: const Row(

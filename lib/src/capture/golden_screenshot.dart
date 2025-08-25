@@ -50,27 +50,9 @@ import '../helpers/logger.dart';
 class GoldenScreenshot {
   final _screenshots = <Uint8List>[];
 
-  void add(Uint8List screenshot) {
-    if (screenshot.isEmpty) {
-      logError('[flows][GoldenScreenshot] Empty screenshot added');
-
-      return;
-    }
-    _screenshots.add(screenshot);
-    logDebug(
-      '[flows][GoldenScreenshot] Screenshot added, total count: ${_screenshots.length}',
-    );
-  }
-
-  void addAll(Iterable<Uint8List> screenshots) {
-    for (final screenshot in screenshots) {
-      add(screenshot);
-    }
-  }
-
   List<Uint8List> get screenshots => _screenshots;
 
-  Future<Uint8List> captureScreenshot() async {
+  Future<void> captureScreenshot() async {
     final RenderRepaintBoundary boundary = find
         .byElementPredicate(
           (element) => element.renderObject is RenderRepaintBoundary,
@@ -115,7 +97,9 @@ class GoldenScreenshot {
 
     logDebug('[flows][captureScreenshot] Screenshot converted to bytes.');
 
-    return byteData.buffer.asUint8List();
+    screenshots.add(
+      byteData.buffer.asUint8List(),
+    );
   }
 
   Future<ui.Image> _cropImage(

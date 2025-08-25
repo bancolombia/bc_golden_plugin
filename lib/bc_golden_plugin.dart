@@ -5,7 +5,10 @@ library bc_golden_plugin;
 
 export 'package:logger/src/log_level.dart';
 
+export 'src/capture/golden_screenshot.dart';
 export 'src/config/bc_golden_configuration.dart';
-export 'src/config/golden_device_data.dart';
 export 'src/config/golden_capture_config.dart';
+export 'src/config/golden_device_data.dart';
+export 'src/config/window_configuration.dart';
 export 'src/testkit/golden_testing_tools.dart';
+export 'src/testkit/test_base.dart';

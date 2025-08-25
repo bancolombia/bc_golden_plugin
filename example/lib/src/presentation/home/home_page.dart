@@ -8,9 +8,11 @@ class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     required this.title,
+    this.backgroundColor,
   });
 
   final String title;
+  final Color? backgroundColor;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: widget.backgroundColor ?? Colors.white,
       appBar: AppBar(
         title: Text(
           widget.title,
