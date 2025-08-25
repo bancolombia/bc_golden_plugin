@@ -110,9 +110,9 @@ void main() {
     test('throws ArgumentError if the list is empty.', () async {
       final goldenScreenshot = GoldenScreenshot();
 
-      const config = GoldenFlowConfig(
+      const config = GoldenCaptureConfig(
         testName: 'Test',
-        layoutType: FlowLayoutType.vertical,
+        layoutType: CaptureLayoutType.vertical,
         spacing: 8,
         maxScreensPerRow: 2,
       );
@@ -131,9 +131,9 @@ void main() {
         shotB,
       ]);
 
-      const config = GoldenFlowConfig(
+      const config = GoldenCaptureConfig(
         testName: 'Test',
-        layoutType: FlowLayoutType.vertical,
+        layoutType: CaptureLayoutType.vertical,
         spacing: 8,
         maxScreensPerRow: 2,
       );
@@ -160,9 +160,9 @@ void main() {
         shotC,
       ]);
 
-      const config = GoldenFlowConfig(
+      const config = GoldenCaptureConfig(
         testName: 'Test',
-        layoutType: FlowLayoutType.horizontal,
+        layoutType: CaptureLayoutType.horizontal,
         spacing: 12,
         maxScreensPerRow: 3,
       );
@@ -188,9 +188,9 @@ void main() {
         shotC,
       ]);
 
-      const config = GoldenFlowConfig(
+      const config = GoldenCaptureConfig(
         testName: 'Test',
-        layoutType: FlowLayoutType.grid,
+        layoutType: CaptureLayoutType.grid,
         spacing: 10,
         maxScreensPerRow: 2,
       );
@@ -213,9 +213,9 @@ void main() {
         goldenScreenshot.add(await pngOf(width: 800, height: 1200));
       }
 
-      const config = GoldenFlowConfig(
+      const config = GoldenCaptureConfig(
         testName: 'Test',
-        layoutType: FlowLayoutType.vertical,
+        layoutType: CaptureLayoutType.vertical,
         spacing: 16,
         maxScreensPerRow: 2,
       );
@@ -242,9 +242,9 @@ void main() {
           shotB,
         ]);
 
-        const config = GoldenFlowConfig(
+        const config = GoldenCaptureConfig(
           testName: 'Test',
-          layoutType: FlowLayoutType.vertical,
+          layoutType: CaptureLayoutType.vertical,
           spacing: 8,
           maxScreensPerRow: 2,
         );

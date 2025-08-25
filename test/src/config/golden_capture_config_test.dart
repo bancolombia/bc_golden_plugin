@@ -93,8 +93,7 @@ void main() {
           equals('CaptureLayoutType.vertical'));
       expect(CaptureLayoutType.horizontal.toString(),
           equals('CaptureLayoutType.horizontal'));
-      expect(
-          CaptureLayoutType.grid.toString(), equals('CaptureLayoutType.grid'));
+      expect(CaptureLayoutType.grid.toString(), equals('CaptureLayoutType.grid'));
     });
   });
 

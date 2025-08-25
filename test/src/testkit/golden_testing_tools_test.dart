@@ -9,8 +9,8 @@ import 'package:mockito/annotations.dart';
   MockSpec<GoldenScreenshot>(),
   MockSpec<Widget>(),
 ])
-class FakeFlowStep implements FlowStep {
-  FakeFlowStep({
+class FakeGoldenStep implements GoldenStep {
+  FakeGoldenStep({
     required this.stepName,
     required this.widgetBuilder,
     this.setupAction,
@@ -46,7 +46,7 @@ void main() {
     expect(convertedIcon, isA<IconData>());
   });
 
-  bcGoldenTest(
+  BcGoldenCapture.single(
     'Test with real shadows',
     (tester) async {
       counter++;
@@ -54,32 +54,45 @@ void main() {
     shouldUseRealShadows: true,
   );
 
-  test('bcGoldenTest should run test with real shadows', () async {
+  test('BcGoldenCapture.single should run test with real shadows', () async {
     expect(counter, 1);
   });
 
-  group('goldenFlowTest', () {
-    const config = GoldenFlowConfig(
-      layoutType: FlowLayoutType.vertical,
+  // Test backward compatibility with deprecated functions
+  bcGoldenTest(
+    'Test deprecated bcGoldenTest (backward compatibility)',
+    (tester) async {
+      counter++;
+    },
+    shouldUseRealShadows: true,
+  );
+
+  test('Deprecated bcGoldenTest should still work', () async {
+    expect(counter, 2);
+  });
+
+  group('BcGoldenCapture.multiple', () {
+    const config = GoldenCaptureConfig(
+      layoutType: CaptureLayoutType.vertical,
       spacing: 8,
       maxScreensPerRow: 2,
       delayBetweenScreens: Duration.zero,
       testName: 'sample_flow',
     );
 
-    final steps = <FlowStep>[
-      FlowStep(
+    final steps = <GoldenStep>[
+      GoldenStep(
         stepName: 'Home',
         widgetBuilder: () => const ColoredBox(color: Colors.blue),
         setupAction: (tester) async {},
         verifyAction: (tester) async {},
       ),
-      FlowStep(
+      GoldenStep(
         stepName: 'Details',
         widgetBuilder: () => const ColoredBox(color: Colors.red),
       ),
     ];
 
-    goldenFlowTest('renders flow and matches golden', steps, config);
+    BcGoldenCapture.multiple('renders flow and matches golden', steps, config);
   });
 }

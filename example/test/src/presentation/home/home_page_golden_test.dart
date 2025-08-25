@@ -34,33 +34,33 @@ void main() {
     shouldUseRealShadows: true,
   );
 
-  goldenFlowTest(
+  BcGoldenCapture.multiple(
     'Multiple tests',
     [
-      FlowStep(
+      GoldenStep(
         stepName: 'home',
         widgetBuilder: () => const HomePage(title: 'Flutter Demo Home Page'),
       ),
-      FlowStep(
+      GoldenStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
           title: 'Page 1',
         ),
       ),
-      FlowStep(
+      GoldenStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
           title: 'Page 2',
         ),
       ),
-      FlowStep(
+      GoldenStep(
         stepName: 'home2',
         widgetBuilder: () => const HomePage(
           title: 'Page 3',
         ),
       ),
     ],
-    GoldenFlowConfig(
+    GoldenCaptureConfig(
       testName: 'multiple_screens',
       device: GoldenDeviceData.galaxyS25,
       spacing: 100,
