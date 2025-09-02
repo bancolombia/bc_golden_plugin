@@ -14,79 +14,45 @@ void main() {
     return frame.image;
   }
 
-  group('GoldenScreenshot.add', () {
-    test('add valid screenshots and rejects empty ones', () {
-      final goldenScreenshot = GoldenScreenshot();
+  Widget createColorWidget(Color color, Size size) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: RepaintBoundary(
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: ColoredBox(color: color),
+          ),
+        ),
+      ),
+    );
+  }
 
-      expect(goldenScreenshot.screenshots, isEmpty);
-
-      expect(goldenScreenshot.screenshots, isA<List<Uint8List>>());
-    });
-  });
-
-  group('GoldenScreenshot.captureScreenshot', () {
+  group('GoldenScreenshot extension', () {
     testWidgets(
       'captures a PNG image from RepaintBoundary widget.',
       (tester) async {
         await tester.runAsync(() async {
-          final goldenScreenshot = GoldenScreenshot();
-
           const size = Size(120, 80);
 
-          await tester.pumpWidget(
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: RepaintBoundary(
-                  child: SizedBox(
-                    width: size.width,
-                    height: size.height,
-                    child: const ColoredBox(color: Colors.blue),
-                  ),
-                ),
-              ),
-            ),
-          );
-
+          await tester.pumpWidget(createColorWidget(Colors.blue, size));
           await tester.pumpAndSettle();
 
-          await goldenScreenshot.captureScreenshot();
+          final screenshot = await tester.captureGoldenScreenshot();
 
-          expect(goldenScreenshot.screenshots, hasLength(1));
+          expect(screenshot, isNotEmpty);
 
-          final bytes = goldenScreenshot.screenshots.first;
-          expect(bytes, isNotEmpty);
-
-          final img = await decode(bytes);
+          final img = await decode(screenshot);
           expect(img.width, equals(size.width.toInt()));
           expect(img.height, equals(size.height.toInt()));
           img.dispose();
         });
       },
     );
-  });
-
-  group('GoldenScreenshot.combineScreenshots', () {
-    Widget createColorWidget(Color color, Size size) {
-      return Directionality(
-        textDirection: TextDirection.ltr,
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: RepaintBoundary(
-            child: SizedBox(
-              width: size.width,
-              height: size.height,
-              child: ColoredBox(color: color),
-            ),
-          ),
-        ),
-      );
-    }
 
     testWidgets('throws ArgumentError if the list is empty.', (tester) async {
-      final goldenScreenshot = GoldenScreenshot();
-
       const config = GoldenCaptureConfig(
         testName: 'Test',
         layoutType: CaptureLayoutType.vertical,
@@ -95,24 +61,22 @@ void main() {
       );
 
       expect(
-        () => goldenScreenshot.combineScreenshots(config, []),
+        () => tester.combineGoldenScreenshots(config, []),
         throwsA(isA<ArgumentError>()),
       );
     });
 
     testWidgets('combines in vertical layout', (tester) async {
       await tester.runAsync(() async {
-        final goldenScreenshot = GoldenScreenshot();
-
         await tester
             .pumpWidget(createColorWidget(Colors.red, const Size(100, 180)));
         await tester.pumpAndSettle();
-        await goldenScreenshot.captureScreenshot();
+        await tester.captureGoldenScreenshot();
 
         await tester
             .pumpWidget(createColorWidget(Colors.green, const Size(100, 180)));
         await tester.pumpAndSettle();
-        await goldenScreenshot.captureScreenshot();
+        await tester.captureGoldenScreenshot();
 
         const config = GoldenCaptureConfig(
           testName: 'Test',
@@ -121,7 +85,7 @@ void main() {
           maxScreensPerRow: 2,
         );
 
-        final combined = await goldenScreenshot.combineScreenshots(
+        final combined = await tester.combineGoldenScreenshots(
           config,
           ['Step A', 'Step B'],
         );
@@ -137,22 +101,20 @@ void main() {
 
     testWidgets('combines in horizontal layout', (tester) async {
       await tester.runAsync(() async {
-        final goldenScreenshot = GoldenScreenshot();
-
         await tester
             .pumpWidget(createColorWidget(Colors.red, const Size(100, 180)));
         await tester.pumpAndSettle();
-        await goldenScreenshot.captureScreenshot();
+        await tester.captureGoldenScreenshot();
 
         await tester
             .pumpWidget(createColorWidget(Colors.green, const Size(100, 180)));
         await tester.pumpAndSettle();
-        await goldenScreenshot.captureScreenshot();
+        await tester.captureGoldenScreenshot();
 
         await tester
             .pumpWidget(createColorWidget(Colors.blue, const Size(100, 180)));
         await tester.pumpAndSettle();
-        await goldenScreenshot.captureScreenshot();
+        await tester.captureGoldenScreenshot();
 
         const config = GoldenCaptureConfig(
           testName: 'Test',
@@ -161,7 +123,7 @@ void main() {
           maxScreensPerRow: 3,
         );
 
-        final combined = await goldenScreenshot.combineScreenshots(
+        final combined = await tester.combineGoldenScreenshots(
           config,
           ['A', 'B', 'C'],
         );
@@ -178,26 +140,20 @@ void main() {
       'combines in grid layout with maxScreensPerRow',
       (tester) async {
         await tester.runAsync(() async {
-          final goldenScreenshot = GoldenScreenshot();
-
           await tester
               .pumpWidget(createColorWidget(Colors.red, const Size(100, 180)));
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
 
           await tester.pumpWidget(
-            createColorWidget(
-              Colors.green,
-              const Size(100, 180),
-            ),
-          );
+              createColorWidget(Colors.green, const Size(100, 180)));
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
 
           await tester
               .pumpWidget(createColorWidget(Colors.blue, const Size(100, 180)));
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
 
           const config = GoldenCaptureConfig(
             testName: 'Test',
@@ -206,7 +162,7 @@ void main() {
             maxScreensPerRow: 2,
           );
 
-          final combined = await goldenScreenshot.combineScreenshots(
+          final combined = await tester.combineGoldenScreenshots(
             config,
             ['1', '2', '3'],
           );
@@ -222,8 +178,6 @@ void main() {
 
     testWidgets('respects canvas limit and expands if needed', (tester) async {
       await tester.runAsync(() async {
-        final goldenScreenshot = GoldenScreenshot();
-
         for (int i = 0; i < 5; i++) {
           await tester.pumpWidget(
             createColorWidget(
@@ -232,7 +186,7 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
         }
 
         const config = GoldenCaptureConfig(
@@ -242,12 +196,11 @@ void main() {
           maxScreensPerRow: 2,
         );
         final names = List<String>.generate(
-          goldenScreenshot.screenshots.length,
+          tester.goldenScreenshots.length,
           (i) => 'Step ${i + 1}',
         );
 
-        final combined =
-            await goldenScreenshot.combineScreenshots(config, names);
+        final combined = await tester.combineGoldenScreenshots(config, names);
         final img = await decode(combined);
 
         expect(img.width, lessThanOrEqualTo(4096));
@@ -260,21 +213,15 @@ void main() {
       'fails if stepnames list is shorter than screenshots',
       (tester) async {
         await tester.runAsync(() async {
-          final goldenScreenshot = GoldenScreenshot();
-
           await tester
               .pumpWidget(createColorWidget(Colors.red, const Size(100, 180)));
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
 
           await tester.pumpWidget(
-            createColorWidget(
-              Colors.green,
-              const Size(100, 180),
-            ),
-          );
+              createColorWidget(Colors.green, const Size(100, 180)));
           await tester.pumpAndSettle();
-          await goldenScreenshot.captureScreenshot();
+          await tester.captureGoldenScreenshot();
 
           const config = GoldenCaptureConfig(
             testName: 'Test',
@@ -284,7 +231,7 @@ void main() {
           );
 
           expect(
-            () => goldenScreenshot.combineScreenshots(
+            () => tester.combineGoldenScreenshots(
               config,
               ['Only one'],
             ),

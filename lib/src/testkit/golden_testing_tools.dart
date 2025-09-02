@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
+import '../capture/golden_animation_capture.dart';
+import '../config/golden_animation_config.dart';
 import '../config/golden_capture_config.dart';
 import '../helpers/helpers.dart';
 import '../helpers/logger.dart';
@@ -89,7 +91,6 @@ class BcGoldenCapture {
     Level logLevel = Level.off,
     bool shouldUseRealShadows = true,
   }) {
-    final GoldenScreenshot screenshotter = GoldenScreenshot();
     setLogLevel(logLevel);
 
     testWidgets(description, (tester) async {
@@ -146,7 +147,7 @@ class BcGoldenCapture {
           );
 
           await tester.runAsync(() async {
-            await screenshotter.captureScreenshot();
+            await tester.captureGoldenScreenshot();
             logDebug(
               '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
             );
@@ -159,7 +160,7 @@ class BcGoldenCapture {
       }
 
       await tester.runAsync(() async {
-        final combinedImage = await screenshotter.combineScreenshots(
+        final combinedImage = await tester.combineGoldenScreenshots(
           config,
           steps.map((s) => s.stepName).toList(),
         );
@@ -177,6 +178,87 @@ class BcGoldenCapture {
         );
       });
     });
+  }
+
+  /// ## animation
+  /// Function to capture golden tests of animations at specific timestamps.
+  /// This function is tagged with 'golden'.
+  ///
+  /// Creates a comprehensive visual test that shows an animation's progression
+  /// by capturing frames at specified timestamps and combining them into a single image.
+  ///
+  /// - [description] A brief description of the animation test.
+  /// - [widget] The animated widget to test.
+  /// - [steps] List of animation steps defining when to capture frames.
+  /// - [config] Configuration for the animation capture including layout and timing.
+  /// - [animationSetup] Optional function to set up the animation before starting.
+  /// - [shouldUseRealShadows] Whether to render shadows or not.
+  /// - [logLevel] The log level for the test, defaulting to `Level.off`.
+  @isTest
+  static void animation(
+    String description,
+    Widget widget,
+    List<GoldenAnimationStep> steps,
+    GoldenAnimationConfig config, {
+    Future<void> Function(WidgetTester)? animationSetup,
+    bool shouldUseRealShadows = true,
+    Level logLevel = Level.off,
+  }) {
+    setLogLevel(logLevel);
+
+    testWidgets(
+      description,
+      (widgetTester) async {
+        //ignore: always_declare_return_types
+        body() async {
+          logDebug('[golden][animation] Starting animation test: $description');
+
+          if (steps.isEmpty) {
+            throw ArgumentError('Animation steps cannot be empty');
+          }
+
+          if (!config.isValid) {
+            throw ArgumentError(
+              'Animation configuration is invalid. All steps must be within totalDuration.',
+            );
+          }
+
+          final initialDebugDisableShadowsValue = debugDisableShadows;
+          debugDisableShadows = !shouldUseRealShadows;
+
+          try {
+            logDebug('[golden][animation] Setting up animation capture...');
+
+            final combinedImage = await widgetTester.captureAnimation(
+              widget: TestBase.appGoldenTest(
+                widget: widget,
+                key: GlobalKey(),
+              ),
+              config: config,
+              animationSetup: animationSetup,
+            );
+
+            logDebug('[golden][animation] Comparing with golden file...');
+            final testPath =
+                (goldenFileComparator as LocalFileComparator).basedir.path;
+            await localFileComparator(testPath);
+
+            await expectLater(
+              combinedImage,
+              matchesGoldenFile('goldens/${config.testName}_animation.png'),
+            );
+
+            logDebug(
+                '[golden][animation] ✓ Animation test completed: $description');
+          } finally {
+            debugDisableShadows = initialDebugDisableShadowsValue;
+          }
+        }
+
+        await widgetTester.runAsync(body);
+      },
+      tags: ['golden'],
+    );
   }
 }
 
