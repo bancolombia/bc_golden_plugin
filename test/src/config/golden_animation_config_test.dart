@@ -132,8 +132,9 @@ void main() {
 
       expect(
         () async => await tester.captureAnimation(
-          widget: const SizedBox(),
-          config: invalidConfig,
+          const SizedBox(),
+          invalidConfig,
+          (WidgetTester tester) async {},
         ),
         throwsArgumentError,
       );

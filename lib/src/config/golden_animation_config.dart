@@ -10,7 +10,7 @@ import 'golden_capture_config.dart';
 /// This class defines when to capture a frame during an animation and allows
 /// for optional setup and verification actions at that specific timestamp.
 ///
-/// * [timestamp] The exact time in the animation when this frame should be captured.
+/// * [timestamp] The exact time in the animation when this frame should be captured in ms.
 /// * [frameName] A descriptive name for this frame (e.g., "start", "peak", "end").
 /// * [setupAction] Optional function to execute before capturing this frame.
 /// * [verifyAction] Optional function to verify the state after capturing this frame.

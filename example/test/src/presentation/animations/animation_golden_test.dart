@@ -6,28 +6,6 @@ void main() {
   BcGoldenCapture.animation(
     'Simple fade animation test',
     const SimpleFadeAnimation(),
-    const [
-      GoldenAnimationStep(
-        timestamp: Duration.zero,
-        frameName: 'start_invisible',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 290),
-        frameName: 'half_visible',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 300),
-        frameName: 'fully_visible',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 400),
-        frameName: 'fully_visible',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 500),
-        frameName: 'fully_visible',
-      ),
-    ],
     GoldenAnimationConfig(
       testName: 'simple_fade',
       totalDuration: const Duration(milliseconds: 500),
@@ -41,11 +19,39 @@ void main() {
           frameName: 'half_visible',
         ),
         GoldenAnimationStep(
-          timestamp: Duration(milliseconds: 300),
+          timestamp: Duration(milliseconds: 320),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 340),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 360),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 380),
           frameName: 'fully_visible',
         ),
         GoldenAnimationStep(
           timestamp: Duration(milliseconds: 400),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 420),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 440),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 460),
+          frameName: 'fully_visible',
+        ),
+        GoldenAnimationStep(
+          timestamp: Duration(milliseconds: 480),
           frameName: 'fully_visible',
         ),
         GoldenAnimationStep(
@@ -63,27 +69,10 @@ void main() {
   BcGoldenCapture.animation(
     'Loading spinner rotation',
     const CircularProgressIndicator(),
-    const [
-      GoldenAnimationStep(
-        timestamp: Duration.zero,
-        frameName: '0_degrees',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 250),
-        frameName: '90_degrees',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 500),
-        frameName: '180_degrees',
-      ),
-      GoldenAnimationStep(
-        timestamp: Duration(milliseconds: 750),
-        frameName: '270_degrees',
-      ),
-    ],
     const GoldenAnimationConfig(
       testName: 'spinner_rotation',
       totalDuration: Duration(milliseconds: 1000),
+      showTimelineLabels: true,
       animationSteps: [
         GoldenAnimationStep(
           timestamp: Duration.zero,

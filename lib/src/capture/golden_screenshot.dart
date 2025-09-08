@@ -37,8 +37,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../config/golden_capture_config.dart';
 import '../helpers/logger.dart';
+import 'helpers.dart';
 
-// Global storage for screenshots per test session
 final Map<WidgetTester, List<Uint8List>> _screenshotStorage = {};
 
 extension GoldenScreenshot on WidgetTester {
@@ -94,7 +94,6 @@ extension GoldenScreenshot on WidgetTester {
 
     final screenshot = byteData.buffer.asUint8List();
 
-    // Initialize the list if it doesn't exist
     _screenshotStorage[this] ??= <Uint8List>[];
     _screenshotStorage[this]!.add(screenshot);
 
@@ -127,7 +126,7 @@ extension GoldenScreenshot on WidgetTester {
         '[flows][combineScreenshots] Decoding first image to get dimensions...',
       );
       final firstImage =
-          await _decodeImageBytes(screenshots.firstOrNull ?? Uint8List(0));
+          await decodeImageBytes(screenshots.firstOrNull ?? Uint8List(0));
 
       final screenWidth = firstImage.width.toDouble();
       final screenHeight = firstImage.height.toDouble();
@@ -179,7 +178,7 @@ extension GoldenScreenshot on WidgetTester {
         );
 
         try {
-          final image = await _decodeImageBytes(screenshots[index]);
+          final image = await decodeImageBytes(screenshots[index]);
           final position = _calculateImagePosition(
             index,
             screenWidth * scaleFactor,
@@ -211,7 +210,7 @@ extension GoldenScreenshot on WidgetTester {
             scaleFactor,
           );
 
-          _drawBorder(
+          drawBorder(
             canvas,
             position,
             screenWidth * scaleFactor,
@@ -313,14 +312,8 @@ extension GoldenScreenshot on WidgetTester {
     );
 
     logDebug('[flows][_cropImage] Decoding cropped image from pixels...');
-    return completer.future;
-  }
 
-  /// Decodes an image from byte data.
-  Future<ui.Image> _decodeImageBytes(Uint8List bytes) async {
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    return frame.image;
+    return completer.future;
   }
 
   /// Calculates the dimensions of the canvas based on layout configuration.
@@ -436,21 +429,5 @@ extension GoldenScreenshot on WidgetTester {
     );
 
     textPainter.dispose();
-  }
-
-  /// Draws a border around the screenshot.
-  void _drawBorder(
-    Canvas canvas,
-    Offset position,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    canvas.drawRect(
-      Rect.fromLTWH(position.dx, position.dy, screenWidth, screenHeight),
-      Paint()
-        ..color = Colors.grey.shade300
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
-    );
   }
 }

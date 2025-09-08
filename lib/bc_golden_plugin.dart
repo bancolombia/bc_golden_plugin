@@ -3,7 +3,7 @@
 /// This library provides configuration and testing tools for the bc_golden_plugin.
 library bc_golden_plugin;
 
-export 'package:logger/src/log_level.dart';
+export 'package:logger/logger.dart';
 
 export 'src/capture/golden_animation_capture.dart';
 export 'src/capture/golden_screenshot.dart';
