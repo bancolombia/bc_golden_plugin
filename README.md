@@ -217,11 +217,7 @@ BcGoldenCapture.animation(
 The animation testing feature captures frames at specific moments in your animation timeline, creating a comprehensive visual test that shows the animation's progression. This is particularly useful for:
 
 - **UI Transitions**: Validating smooth transitions between states
-- **Loading Animations**: Ensuring consistent spinner or progress animations  
-- **Gesture Animations**: Testing animations triggered by user interactions
-- **Complex Animations**: Multi-step animations with precise timing requirements
-
-For detailed documentation on animation testing, see [Animation Testing Guide](doc/animation_testing.md).
+- **Loading Animations**: Ensuring consistent spinner or progress animations
 
 ## bcGoldenTest (Legacy) 🏗
 The is a legacy function that is still supported but deprecated. For new tests, please use `BcGoldenCapture.single` instead. This function is default tagged with "golden" and also has additional features for the tests, see the code below:
