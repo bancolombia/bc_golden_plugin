@@ -1,38 +1,29 @@
-/// A class that handles capturing and managing golden screenshots.
+/// An extension on WidgetTester that handles capturing and managing golden screenshots.
 ///
-/// This class provides functionality to capture screenshots, add them to a collection,
+/// This extension provides functionality to capture screenshots, add them to a collection,
 /// crop images, and combine multiple screenshots into a single image. It also includes
 /// methods for calculating canvas dimensions based on the layout configuration and
 /// positioning images on the canvas.
 ///
 /// ## Usage
-/// To use the `GoldenScreenshot` class, create an instance and call its methods
-/// to capture and manage screenshots as needed.
+/// To use the `GoldenScreenshot` extension, call its methods directly on a WidgetTester
+/// instance within your tests.
 ///
 /// ### Example
 /// ```dart
-/// final goldenScreenshot = GoldenScreenshot();
-/// final screenshot = await goldenScreenshot.captureScreenshot();
+/// testWidgets('My golden test', (tester) async {
+///   await tester.captureGoldenScreenshot();
 ///
-/// goldenScreenshot.add(screenshot);
-///
-/// final combinedImage = await goldenScreenshot.combineScreenshots(
-///  config,
-///  stepNames,
-/// );
+///   final combinedImage = await tester.combineGoldenScreenshots(
+///     config,
+///     stepNames,
+///   );
+/// });
 /// ```
 ///
 /// ## Methods
-/// - `add(Uint8List screenshot)`: Adds a screenshot to the collection.
-/// - `List<Uint8List> get screenshots`: Retrieves the list of captured screenshots.
-/// - `Future<Uint8List> captureScreenshot()`: Captures a screenshot of the current widget.
-/// - `Future<Uint8List> combineScreenshots(List<Uint8List> screenshots, GoldenCaptureConfig config, List<String> stepNames)`: Combines multiple screenshots into a single image.
-///
-/// ## Private Methods
-/// - `Future<ui.Image> _cropImage(ui.Image image, Offset topLeft, Size size)`: Crops the given image to the specified size.
-/// - `Future<ui.Image> _decodeImage(Uint8List bytes)`: Decodes the image from the provided byte data.
-/// - `Size _calculateCanvasDimensions(int screenCount, double screenWidth, double screenHeight, GoldenCaptureConfig config)`: Calculates the dimensions of the canvas based on the number of screens and layout configuration.
-/// - `Offset _calculateImagePosition(int index, double screenWidth, double screenHeight, GoldenCaptureConfig config)`: Calculates the position of an image on the canvas based on its index and layout configuration.
+/// - `Future<Uint8List> captureGoldenScreenshot()`: Captures a screenshot of the current widget and returns it.
+/// - `Future<Uint8List> combineGoldenScreenshots(GoldenCaptureConfig config, List<String> stepNames)`: Combines multiple screenshots into a single image.
 library;
 
 import 'dart:async';
@@ -46,13 +37,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../config/golden_capture_config.dart';
 import '../helpers/logger.dart';
+import 'helpers.dart';
 
-class GoldenScreenshot {
-  final _screenshots = <Uint8List>[];
+final Map<WidgetTester, List<Uint8List>> _screenshotStorage = {};
 
-  List<Uint8List> get screenshots => _screenshots;
+extension GoldenScreenshot on WidgetTester {
+  /// Gets the list of captured screenshots for this tester instance.
+  List<Uint8List> get goldenScreenshots => _screenshotStorage[this] ?? [];
 
-  Future<void> captureScreenshot() async {
+  /// Captures a screenshot of the current widget and adds it to the collection.
+  /// Returns the captured screenshot as Uint8List.
+  Future<Uint8List> captureGoldenScreenshot() async {
     final RenderRepaintBoundary boundary = find
         .byElementPredicate(
           (element) => element.renderObject is RenderRepaintBoundary,
@@ -69,7 +64,7 @@ class GoldenScreenshot {
       '[flows][captureScreenshot] Screenshot captured, converting to bytes...',
     );
 
-    final ui.Image croppedImage = await _cropImage(
+    final ui.Image croppedImage = await _cropImageToSize(
       image,
       Offset.zero,
       Size(
@@ -97,71 +92,26 @@ class GoldenScreenshot {
 
     logDebug('[flows][captureScreenshot] Screenshot converted to bytes.');
 
-    screenshots.add(
-      byteData.buffer.asUint8List(),
-    );
+    final screenshot = byteData.buffer.asUint8List();
+
+    _screenshotStorage[this] ??= <Uint8List>[];
+    _screenshotStorage[this]!.add(screenshot);
+
+    return screenshot;
   }
 
-  Future<ui.Image> _cropImage(
-    ui.Image image,
-    Offset topLeft,
-    Size size,
-  ) async {
-    final top = topLeft.dy.round();
-    final left = topLeft.dx.round();
-    final width = size.width.round();
-    final height = size.height.round();
-
-    logDebug('[flows][_cropImage] Cropping image: '
-        'top: $top, left: $left, width: $width, height: $height');
-
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-    if (byteData == null) {
-      throw Exception('Failed to get byte data from image');
-    }
-
-    const bytesPerPixel = 4;
-
-    final originalBytes = byteData.buffer.asUint8List();
-    final originalWidth = image.width;
-
-    final croppedBytes = Uint8List(width * height * bytesPerPixel);
-
-    logDebug('[flows][_cropImage] Creating cropped bytes buffer: '
-        '${croppedBytes.length} bytes');
-
-    for (int row = 0; row < height; row++) {
-      final srcStart = ((top + row) * originalWidth + left) * bytesPerPixel;
-      final destStart = row * width * bytesPerPixel;
-      croppedBytes.setRange(
-        destStart,
-        destStart + width * bytesPerPixel,
-        originalBytes,
-        srcStart,
-      );
-    }
-
-    logDebug('[flows][_cropImage] Cropped bytes created successfully.');
-
-    final completer = Completer<ui.Image>();
-
-    ui.decodeImageFromPixels(
-      croppedBytes,
-      width,
-      height,
-      ui.PixelFormat.rgba8888,
-      completer.complete as ui.ImageDecoderCallback,
-    );
-
-    logDebug('[flows][_cropImage] Decoding cropped image from pixels...');
-
-    return completer.future;
+  /// Clears all captured screenshots for this tester instance.
+  void clearGoldenScreenshots() {
+    _screenshotStorage[this]?.clear();
   }
 
-  Future<Uint8List> combineScreenshots(
+  /// Combines multiple screenshots into a single image.
+  Future<Uint8List> combineGoldenScreenshots(
     GoldenCaptureConfig config,
     List<String> stepNames,
   ) async {
+    final screenshots = goldenScreenshots;
+
     logDebug(
       '[flows][combineScreenshots] Starting combineScreenshots with ${screenshots.length} screenshots',
     );
@@ -176,7 +126,7 @@ class GoldenScreenshot {
         '[flows][combineScreenshots] Decoding first image to get dimensions...',
       );
       final firstImage =
-          await _decodeImage(screenshots.firstOrNull ?? Uint8List(0));
+          await decodeImageBytes(screenshots.firstOrNull ?? Uint8List(0));
 
       final screenWidth = firstImage.width.toDouble();
       final screenHeight = firstImage.height.toDouble();
@@ -228,7 +178,7 @@ class GoldenScreenshot {
         );
 
         try {
-          final image = await _decodeImage(screenshots[index]);
+          final image = await decodeImageBytes(screenshots[index]);
           final position = _calculateImagePosition(
             index,
             screenWidth * scaleFactor,
@@ -260,7 +210,7 @@ class GoldenScreenshot {
             scaleFactor,
           );
 
-          _drawBorder(
+          drawBorder(
             canvas,
             position,
             screenWidth * scaleFactor,
@@ -312,13 +262,61 @@ class GoldenScreenshot {
     }
   }
 
-  Future<ui.Image> _decodeImage(Uint8List bytes) async {
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
+  /// Crops an image to the specified dimensions.
+  Future<ui.Image> _cropImageToSize(
+    ui.Image image,
+    Offset topLeft,
+    Size size,
+  ) async {
+    final top = topLeft.dy.round();
+    final left = topLeft.dx.round();
+    final width = size.width.round();
+    final height = size.height.round();
 
-    return frame.image;
+    logDebug('[flows][_cropImage] Cropping image: '
+        'top: $top, left: $left, width: $width, height: $height');
+
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    if (byteData == null) {
+      throw Exception('Failed to get byte data from image');
+    }
+
+    const bytesPerPixel = 4;
+    final originalBytes = byteData.buffer.asUint8List();
+    final originalWidth = image.width;
+    final croppedBytes = Uint8List(width * height * bytesPerPixel);
+
+    logDebug('[flows][_cropImage] Creating cropped bytes buffer: '
+        '${croppedBytes.length} bytes');
+
+    for (int row = 0; row < height; row++) {
+      final srcStart = ((top + row) * originalWidth + left) * bytesPerPixel;
+      final destStart = row * width * bytesPerPixel;
+      croppedBytes.setRange(
+        destStart,
+        destStart + width * bytesPerPixel,
+        originalBytes,
+        srcStart,
+      );
+    }
+
+    logDebug('[flows][_cropImage] Cropped bytes created successfully.');
+
+    final completer = Completer<ui.Image>();
+    ui.decodeImageFromPixels(
+      croppedBytes,
+      width,
+      height,
+      ui.PixelFormat.rgba8888,
+      completer.complete as ui.ImageDecoderCallback,
+    );
+
+    logDebug('[flows][_cropImage] Decoding cropped image from pixels...');
+
+    return completer.future;
   }
 
+  /// Calculates the dimensions of the canvas based on layout configuration.
   Size _calculateCanvasDimensions(
     int screenCount,
     double screenWidth,
@@ -351,6 +349,7 @@ class GoldenScreenshot {
     }
   }
 
+  /// Calculates the position of an image on the canvas.
   Offset _calculateImagePosition(
     int index,
     double screenWidth,
@@ -383,6 +382,7 @@ class GoldenScreenshot {
     }
   }
 
+  /// Draws the step title on the canvas.
   void _drawStepTitle(
     Canvas canvas,
     String title,
@@ -408,7 +408,7 @@ class GoldenScreenshot {
 
     textPainter.layout(maxWidth: screenWidth);
 
-    // Fondo para el texto
+    // Background for the text
     canvas.drawRect(
       Rect.fromLTWH(
         position.dx,
@@ -419,7 +419,7 @@ class GoldenScreenshot {
       Paint()..color = Colors.grey.shade100,
     );
 
-    // Texto
+    // Text
     textPainter.paint(
       canvas,
       Offset(
@@ -429,20 +429,5 @@ class GoldenScreenshot {
     );
 
     textPainter.dispose();
-  }
-
-  void _drawBorder(
-    Canvas canvas,
-    Offset position,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    canvas.drawRect(
-      Rect.fromLTWH(position.dx, position.dy, screenWidth, screenHeight),
-      Paint()
-        ..color = Colors.grey.shade300
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
-    );
   }
 }

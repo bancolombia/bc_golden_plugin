@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
+import '../capture/golden_animation_capture.dart';
+import '../config/golden_animation_config.dart';
 import '../config/golden_capture_config.dart';
 import '../helpers/helpers.dart';
 import '../helpers/logger.dart';
@@ -30,7 +32,7 @@ class BcGoldenCapture {
     String description,
     Future<void> Function(WidgetTester) test, {
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.off,
+    Level logLevel = Level.nothing,
   }) {
     setLogLevel(logLevel);
 
@@ -86,97 +88,177 @@ class BcGoldenCapture {
     String description,
     List<GoldenStep> steps,
     GoldenCaptureConfig config, {
-    Level logLevel = Level.off,
+    Level logLevel = Level.nothing,
     bool shouldUseRealShadows = true,
   }) {
-    final GoldenScreenshot screenshotter = GoldenScreenshot();
     setLogLevel(logLevel);
 
-    testWidgets(description, (tester) async {
-      if (config.device != null) {
-        tester.configureWindow(config.device!);
-      }
-
-      await loadAppFonts();
-
-      await tester.awaitImages();
-
-      final initialDebugDisableShadowsValue = debugDisableShadows;
-      debugDisableShadows = !shouldUseRealShadows;
-
-      try {
-        for (int index = 0; index < steps.length; index++) {
-          final step = steps[index];
-
-          logDebug(
-            '[flows][multiple] Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
-          );
-
-          await tester.pumpWidget(
-            TestBase.appGoldenTest(
-              widget: step.widgetBuilder(),
-              key: GlobalKey(),
-            ),
-          );
-
-          logDebug(
-            '[flows][multiple] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
-          );
-
-          if (step.setupAction != null) {
-            await step.setupAction!(tester);
-          }
-
-          logDebug(
-            '[flows][multiple] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
-          );
-
-          await tester.pumpAndSettle();
-
-          if (index > 0) {
-            await tester.pump(config.delayBetweenScreens);
-          }
-
-          if (step.verifyAction != null) {
-            await step.verifyAction!(tester);
-          }
-
-          logDebug(
-            '[flows][multiple] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
-          );
-
-          await tester.runAsync(() async {
-            await screenshotter.captureScreenshot();
-            logDebug(
-              '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
-            );
-          });
+    testWidgets(
+      description,
+      (tester) async {
+        if (config.device != null) {
+          tester.configureWindow(config.device!);
         }
 
-        logDebug('[flows][multiple] Combining screenshots...');
-      } finally {
-        debugDisableShadows = initialDebugDisableShadowsValue;
-      }
+        await loadAppFonts();
 
-      await tester.runAsync(() async {
-        final combinedImage = await screenshotter.combineScreenshots(
-          config,
-          steps.map((s) => s.stepName).toList(),
-        );
+        await tester.awaitImages();
 
-        logDebug('[flows][multiple] ✓ Combined screenshots successfully.');
+        final initialDebugDisableShadowsValue = debugDisableShadows;
+        debugDisableShadows = !shouldUseRealShadows;
 
-        final testPath =
-            (goldenFileComparator as LocalFileComparator).basedir.path;
+        try {
+          for (int index = 0; index < steps.length; index++) {
+            final step = steps[index];
 
-        await localFileComparator(testPath);
+            logDebug(
+              '[flows][multiple] Rendering step ${index + 1}/${steps.length}: ${step.stepName}',
+            );
 
-        await expectLater(
-          combinedImage,
-          matchesGoldenFile('goldens/${config.testName}_flow.png'),
-        );
-      });
-    });
+            await tester.pumpWidget(
+              TestBase.appGoldenTest(
+                widget: step.widgetBuilder(),
+                key: GlobalKey(),
+              ),
+            );
+
+            logDebug(
+              '[flows][multiple] ✓ Rendered step ${index + 1}/${steps.length}: ${step.stepName}',
+            );
+
+            if (step.setupAction != null) {
+              await step.setupAction!(tester);
+            }
+
+            logDebug(
+              '[flows][multiple] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+            );
+
+            await tester.pumpAndSettle();
+
+            if (index > 0) {
+              await tester.pump(config.delayBetweenScreens);
+            }
+
+            if (step.verifyAction != null) {
+              await step.verifyAction!(tester);
+            }
+
+            logDebug(
+              '[flows][multiple] ✓ Verify action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
+            );
+
+            await tester.runAsync(() async {
+              await tester.captureGoldenScreenshot();
+              logDebug(
+                '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
+              );
+            });
+          }
+
+          logDebug('[flows][multiple] Combining screenshots...');
+        } finally {
+          debugDisableShadows = initialDebugDisableShadowsValue;
+        }
+
+        await tester.runAsync(() async {
+          final combinedImage = await tester.combineGoldenScreenshots(
+            config,
+            steps.map((s) => s.stepName).toList(),
+          );
+
+          logDebug('[flows][multiple] ✓ Combined screenshots successfully.');
+
+          final testPath =
+              (goldenFileComparator as LocalFileComparator).basedir.path;
+
+          await localFileComparator(testPath);
+
+          await expectLater(
+            combinedImage,
+            matchesGoldenFile('goldens/${config.testName}_flow.png'),
+          );
+        });
+      },
+      tags: ['golden'],
+    );
+  }
+
+  /// ## animation
+  /// Function to capture golden tests of animations at specific timestamps.
+  /// This function is tagged with 'golden'.
+  ///
+  /// Creates a comprehensive visual test that shows an animation's progression
+  /// by capturing frames at specified timestamps and combining them into a single image.
+  ///
+  /// - [description] A brief description of the animation test.
+  /// - [widget] The animated widget to test.
+  /// - [steps] List of animation steps defining when to capture frames.
+  /// - [config] Configuration for the animation capture including layout and timing.
+  /// - [animationSetup] Optional function to set up the animation before starting.
+  /// - [shouldUseRealShadows] Whether to render shadows or not.
+  /// - [logLevel] The log level for the test, defaulting to `Level.off`.
+  @isTest
+  static void animation(
+    String description,
+    Widget widget,
+    GoldenAnimationConfig config, {
+    Future<void> Function(WidgetTester)? animationSetup,
+    bool shouldUseRealShadows = true,
+    Level logLevel = Level.nothing,
+  }) {
+    setLogLevel(logLevel);
+
+    testWidgets(
+      description,
+      (widgetTester) async {
+        //ignore: always_declare_return_types
+        body() async {
+          logDebug('[golden][animation] Starting animation test: $description');
+
+          if (!config.isValid) {
+            throw ArgumentError(
+              'Animation configuration is invalid. All steps must be within totalDuration.',
+            );
+          }
+
+          final initialDebugDisableShadowsValue = debugDisableShadows;
+          debugDisableShadows = !shouldUseRealShadows;
+
+          try {
+            logDebug('[golden][animation] Setting up animation capture...');
+
+            final combinedImage = await widgetTester.captureAnimation(
+              TestBase.appGoldenTest(
+                widget: widget,
+                key: GlobalKey(),
+              ),
+              config,
+              animationSetup,
+            );
+
+            logDebug('[golden][animation] Comparing with golden file...');
+            final testPath =
+                (goldenFileComparator as LocalFileComparator).basedir.path;
+            await localFileComparator(testPath);
+
+            await expectLater(
+              combinedImage,
+              matchesGoldenFile('goldens/${config.testName}_animation.png'),
+            );
+
+            logDebug(
+              '[golden][animation] ✓ Animation test completed: $description',
+            );
+          } finally {
+            debugDisableShadows = initialDebugDisableShadowsValue;
+          }
+        }
+
+        await widgetTester.runAsync(body);
+      },
+      tags: ['golden'],
+    );
   }
 }
 
@@ -195,7 +277,7 @@ void bcGoldenTest(
   String description,
   Future<void> Function(WidgetTester) test, {
   bool shouldUseRealShadows = true,
-  Level logLevel = Level.off,
+  Level logLevel = Level.nothing,
 }) {
   BcGoldenCapture.single(
     description,

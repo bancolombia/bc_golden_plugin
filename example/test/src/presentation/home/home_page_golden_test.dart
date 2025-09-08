@@ -64,10 +64,8 @@ void main() {
     ),
   );
 
-  testWidgets('Manual golden test', (tester) async {
+  BcGoldenCapture.single('Manual golden test', (tester) async {
     await tester.runAsync(() async {
-      GoldenScreenshot screenshotter = GoldenScreenshot();
-
       tester.configureWindow(
         GoldenDeviceData.iPhone13,
       );
@@ -81,7 +79,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await screenshotter.captureScreenshot();
+      await tester.captureGoldenScreenshot();
 
       await tester.tap(
         find.byKey(
@@ -91,9 +89,9 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await screenshotter.captureScreenshot();
+      await tester.captureGoldenScreenshot();
 
-      final combinedScreenshot = await screenshotter.combineScreenshots(
+      final combinedScreenshot = await tester.combineGoldenScreenshots(
         GoldenCaptureConfig(
           testName: 'manual_golden',
           device: GoldenDeviceData.iPhone13,

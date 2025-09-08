@@ -3,15 +3,10 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i6;
-import 'dart:typed_data' as _i5;
-
-import 'package:bc_golden_plugin/src/capture/golden_screenshot.dart' as _i4;
-import 'package:bc_golden_plugin/src/config/golden_capture_config.dart' as _i7;
-import 'package:flutter/material.dart' as _i2;
-import 'package:flutter/rendering.dart' as _i3;
+import 'package:flutter/foundation.dart' as _i3;
+import 'package:flutter/src/widgets/framework.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i8;
+import 'package:mockito/src/dummies.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -37,12 +32,12 @@ class _FakeElement_0 extends _i1.SmartFake implements _i2.Element {
         );
 
   @override
-  String toString({_i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.info}) =>
+  String toString({_i3.DiagnosticLevel? minLevel = _i3.DiagnosticLevel.info}) =>
       super.toString();
 }
 
 class _FakeDiagnosticsNode_1 extends _i1.SmartFake
-    implements _i2.DiagnosticsNode {
+    implements _i3.DiagnosticsNode {
   _FakeDiagnosticsNode_1(
     Object parent,
     Invocation parentInvocation,
@@ -54,68 +49,9 @@ class _FakeDiagnosticsNode_1 extends _i1.SmartFake
   @override
   String toString({
     _i3.TextTreeConfiguration? parentConfiguration,
-    _i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.info,
+    _i3.DiagnosticLevel? minLevel = _i3.DiagnosticLevel.info,
   }) =>
       super.toString();
-}
-
-/// A class which mocks [GoldenScreenshot].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockGoldenScreenshot extends _i1.Mock implements _i4.GoldenScreenshot {
-  @override
-  List<_i5.Uint8List> get screenshots => (super.noSuchMethod(
-        Invocation.getter(#screenshots),
-        returnValue: <_i5.Uint8List>[],
-        returnValueForMissingStub: <_i5.Uint8List>[],
-      ) as List<_i5.Uint8List>);
-
-  @override
-  void add(_i5.Uint8List? screenshot) => super.noSuchMethod(
-        Invocation.method(
-          #add,
-          [screenshot],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void addAll(Iterable<_i5.Uint8List>? screenshots) => super.noSuchMethod(
-        Invocation.method(
-          #addAll,
-          [screenshots],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  _i6.Future<_i5.Uint8List> captureScreenshot() => (super.noSuchMethod(
-        Invocation.method(
-          #captureScreenshot,
-          [],
-        ),
-        returnValue: _i6.Future<_i5.Uint8List>.value(_i5.Uint8List(0)),
-        returnValueForMissingStub:
-            _i6.Future<_i5.Uint8List>.value(_i5.Uint8List(0)),
-      ) as _i6.Future<_i5.Uint8List>);
-
-  @override
-  _i6.Future<_i5.Uint8List> combineScreenshots(
-    _i7.GoldenFlowConfig? config,
-    List<String>? stepNames,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #combineScreenshots,
-          [
-            config,
-            stepNames,
-          ],
-        ),
-        returnValue: _i6.Future<_i5.Uint8List>.value(_i5.Uint8List(0)),
-        returnValueForMissingStub:
-            _i6.Future<_i5.Uint8List>.value(_i5.Uint8List(0)),
-      ) as _i6.Future<_i5.Uint8List>);
 }
 
 /// A class which mocks [Widget].
@@ -151,14 +87,14 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
           #toStringShort,
           [],
         ),
-        returnValue: _i8.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShort,
             [],
           ),
         ),
-        returnValueForMissingStub: _i8.dummyValue<String>(
+        returnValueForMissingStub: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShort,
@@ -180,7 +116,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
   @override
   String toStringShallow({
     String? joiner = ', ',
-    _i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.debug,
+    _i3.DiagnosticLevel? minLevel = _i3.DiagnosticLevel.debug,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -191,7 +127,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
             #minLevel: minLevel,
           },
         ),
-        returnValue: _i8.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShallow,
@@ -202,7 +138,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
             },
           ),
         ),
-        returnValueForMissingStub: _i8.dummyValue<String>(
+        returnValueForMissingStub: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringShallow,
@@ -219,7 +155,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
   String toStringDeep({
     String? prefixLineOne = '',
     String? prefixOtherLines,
-    _i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.debug,
+    _i3.DiagnosticLevel? minLevel = _i3.DiagnosticLevel.debug,
     int? wrapWidth = 65,
   }) =>
       (super.noSuchMethod(
@@ -233,7 +169,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
             #wrapWidth: wrapWidth,
           },
         ),
-        returnValue: _i8.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringDeep,
@@ -246,7 +182,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
             },
           ),
         ),
-        returnValueForMissingStub: _i8.dummyValue<String>(
+        returnValueForMissingStub: _i4.dummyValue<String>(
           this,
           Invocation.method(
             #toStringDeep,
@@ -262,7 +198,7 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
       ) as String);
 
   @override
-  _i2.DiagnosticsNode toDiagnosticsNode({
+  _i3.DiagnosticsNode toDiagnosticsNode({
     String? name,
     _i3.DiagnosticsTreeStyle? style,
   }) =>
@@ -297,19 +233,19 @@ class MockWidget extends _i1.Mock implements _i2.Widget {
             },
           ),
         ),
-      ) as _i2.DiagnosticsNode);
+      ) as _i3.DiagnosticsNode);
 
   @override
-  List<_i2.DiagnosticsNode> debugDescribeChildren() => (super.noSuchMethod(
+  List<_i3.DiagnosticsNode> debugDescribeChildren() => (super.noSuchMethod(
         Invocation.method(
           #debugDescribeChildren,
           [],
         ),
-        returnValue: <_i2.DiagnosticsNode>[],
-        returnValueForMissingStub: <_i2.DiagnosticsNode>[],
-      ) as List<_i2.DiagnosticsNode>);
+        returnValue: <_i3.DiagnosticsNode>[],
+        returnValueForMissingStub: <_i3.DiagnosticsNode>[],
+      ) as List<_i3.DiagnosticsNode>);
 
   @override
-  String toString({_i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.info}) =>
+  String toString({_i3.DiagnosticLevel? minLevel = _i3.DiagnosticLevel.info}) =>
       super.toString();
 }

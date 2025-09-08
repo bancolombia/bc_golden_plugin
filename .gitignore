@@ -35,6 +35,7 @@ migrate_working_dir/
 /pubspec.lock
 /coverage
 /.vscode/
+**/coverage/
 
 # Web related
 lib/generated_plugin_registrant.dart

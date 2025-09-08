@@ -177,6 +177,48 @@ The `GoldenCaptureConfig` class allows you to customize how multiple screenshots
 - `maxScreensPerRow`: Maximum screenshots per row (for grid layout)
 - `device`: Optional device configuration
 
+### Animation Testing 🎬
+
+For testing animations at specific timestamps, use `BcGoldenCapture.animation`:
+
+```dart
+BcGoldenCapture.animation(
+  'Button scale animation',
+  AnimatedButton(),
+  [
+    GoldenAnimationStep(
+      timestamp: Duration.zero,
+      frameName: 'start',
+    ),
+    GoldenAnimationStep(
+      timestamp: Duration(milliseconds: 150),
+      frameName: 'scaled',
+    ),
+    GoldenAnimationStep(
+      timestamp: Duration(milliseconds: 300),
+      frameName: 'end',
+    ),
+  ],
+  GoldenAnimationConfig(
+    testName: 'button_animation',
+    totalDuration: Duration(milliseconds: 300),
+    animationSteps: [...], // Same steps as above
+    layoutType: CaptureLayoutType.horizontal,
+    showTimelineLabels: true,
+  ),
+  animationSetup: (tester) async {
+    // Trigger the animation
+    await tester.tap(find.byType(AnimatedButton));
+    await tester.pump();
+  },
+);
+```
+
+The animation testing feature captures frames at specific moments in your animation timeline, creating a comprehensive visual test that shows the animation's progression. This is particularly useful for:
+
+- **UI Transitions**: Validating smooth transitions between states
+- **Loading Animations**: Ensuring consistent spinner or progress animations
+
 ## bcGoldenTest (Legacy) 🏗
 The is a legacy function that is still supported but deprecated. For new tests, please use `BcGoldenCapture.single` instead. This function is default tagged with "golden" and also has additional features for the tests, see the code below:
 

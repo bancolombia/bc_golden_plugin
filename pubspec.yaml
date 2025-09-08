@@ -2,7 +2,7 @@ name: bc_golden_plugin
 description: Golden Plugin is a software that enables you to test the UI you develop against a reference image or a design in Figma.
 repository: 'https://github.com/bancolombia/bc_golden_plugin'
 
-version: 2.0.0-alpha.2
+version: 2.0.0-alpha.3
 
 platforms:
   android:
@@ -12,8 +12,7 @@ platforms:
   linux:
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.27.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 
 dependencies:
@@ -21,13 +20,13 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  platform: ^3.1.6
-  file: ^7.0.0
+  platform: ^3.1.0
+  file: ^6.1.4
   provider: ^6.1.2
   equatable: ^2.0.5
   meta: ^1.9.1
   flutter_svg: ^2.2.0
-  logger: ^2.6.1
+  logger: ^1.0.0
 
 dev_dependencies:
   flutter_lints: ^3.0.0

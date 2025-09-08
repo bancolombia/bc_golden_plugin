@@ -1,12 +1,10 @@
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
-import 'package:bc_golden_plugin/src/capture/golden_screenshot.dart';
 import 'package:bc_golden_plugin/src/testkit/window_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 
 @GenerateNiceMocks([
-  MockSpec<GoldenScreenshot>(),
   MockSpec<Widget>(),
 ])
 class FakeGoldenStep implements GoldenStep {
