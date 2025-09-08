@@ -20,9 +20,6 @@ jobs:
         run: flutter pub get
       - name: Run tests
         run: flutter test --coverage
-      - uses: codecov/codecov-action@v5
-        with:
-          files: coverage/lcov.info
       - name: Upload golden failures
         if: always()
         uses: actions/upload-artifact@v4
