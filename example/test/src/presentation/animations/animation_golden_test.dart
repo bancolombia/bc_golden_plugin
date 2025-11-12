@@ -5,7 +5,7 @@ void main() {
   // Test de ejemplo simple para demostrar la funcionalidad
   BcGoldenCapture.animation(
     'Simple fade animation test',
-    const SimpleFadeAnimation(),
+    () => const SimpleFadeAnimation(),
     GoldenAnimationConfig(
       testName: 'simple_fade',
       totalDuration: const Duration(milliseconds: 500),
@@ -68,7 +68,7 @@ void main() {
 
   BcGoldenCapture.animation(
     'Loading spinner rotation',
-    const CircularProgressIndicator(),
+    () => const CircularProgressIndicator(),
     const GoldenAnimationConfig(
       testName: 'spinner_rotation',
       totalDuration: Duration(milliseconds: 1000),

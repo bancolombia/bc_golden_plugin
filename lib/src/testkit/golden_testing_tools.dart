@@ -176,7 +176,7 @@ class BcGoldenCapture {
 
           await expectLater(
             combinedImage,
-            matchesGoldenFile('goldens/${config.testName}_flow.png'),
+            matchesGoldenFile('goldens/${config.testName}.png'),
           );
         });
       },
@@ -201,7 +201,7 @@ class BcGoldenCapture {
   @isTest
   static void animation(
     String description,
-    Widget widget,
+    Widget Function() widgetBuilder,
     GoldenAnimationConfig config, {
     Future<void> Function(WidgetTester)? animationSetup,
     bool shouldUseRealShadows = true,
@@ -212,6 +212,9 @@ class BcGoldenCapture {
     testWidgets(
       description,
       (widgetTester) async {
+        if (config.device != null) {
+          widgetTester.configureWindow(config.device!);
+        }
         //ignore: always_declare_return_types
         body() async {
           logDebug('[golden][animation] Starting animation test: $description');
@@ -227,25 +230,28 @@ class BcGoldenCapture {
 
           try {
             logDebug('[golden][animation] Setting up animation capture...');
+            final widget = widgetBuilder();
 
-            final combinedImage = await widgetTester.captureAnimation(
-              TestBase.appGoldenTest(
-                widget: widget,
-                key: GlobalKey(),
-              ),
-              config,
-              animationSetup,
-            );
+            await widgetTester.runAsync(() async {
+              final combinedImage = await widgetTester.captureAnimation(
+                TestBase.appGoldenTest(
+                  widget: widget,
+                  key: GlobalKey(),
+                ),
+                config,
+                animationSetup,
+              );
 
-            logDebug('[golden][animation] Comparing with golden file...');
-            final testPath =
-                (goldenFileComparator as LocalFileComparator).basedir.path;
-            await localFileComparator(testPath);
+              logDebug('[golden][animation] Comparing with golden file...');
+              final testPath =
+                  (goldenFileComparator as LocalFileComparator).basedir.path;
+              await localFileComparator(testPath);
 
-            await expectLater(
-              combinedImage,
-              matchesGoldenFile('goldens/${config.testName}_animation.png'),
-            );
+              await expectLater(
+                combinedImage,
+                matchesGoldenFile('goldens/${config.testName}_animation.png'),
+              );
+            });
 
             logDebug(
               '[golden][animation] ✓ Animation test completed: $description',
@@ -255,7 +261,7 @@ class BcGoldenCapture {
           }
         }
 
-        await widgetTester.runAsync(body);
+        await body();
       },
       tags: ['golden'],
     );

@@ -28,7 +28,7 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
     );
 
     if (result.passed) {
-      result.dispose();
+      // result.dispose();
 
       return true;
     }
@@ -42,7 +42,7 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
 
       await generateFailureOutput(result, golden, basedir);
 
-      result.dispose();
+      // result.dispose();
 
       return true;
     }
