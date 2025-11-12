@@ -32,7 +32,7 @@ class BcGoldenCapture {
     String description,
     Future<void> Function(WidgetTester) test, {
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
   }) {
     setLogLevel(logLevel);
 
@@ -88,7 +88,7 @@ class BcGoldenCapture {
     String description,
     List<GoldenStep> steps,
     GoldenCaptureConfig config, {
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
     bool shouldUseRealShadows = true,
   }) {
     setLogLevel(logLevel);
@@ -205,7 +205,7 @@ class BcGoldenCapture {
     GoldenAnimationConfig config, {
     Future<void> Function(WidgetTester)? animationSetup,
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
   }) {
     setLogLevel(logLevel);
 
@@ -355,12 +355,12 @@ Future<void> bcWidgetMatchesImage({
 /// * [targetPlatform] If it's either Android or iOS.
 /// * [safeAreaPadding] Padding used by the device in the safe areas.
 WindowConfigData bcCustomWindowConfigData({
-  required name,
-  required size,
-  required pixelDensity,
-  targetPlatform = TargetPlatform.iOS,
-  borderRadius,
-  safeAreaPadding = EdgeInsets.zero,
+  required String name,
+  required Size size,
+  required double pixelDensity,
+  TargetPlatform targetPlatform = TargetPlatform.iOS,
+  BorderRadius? borderRadius,
+  EdgeInsets safeAreaPadding = EdgeInsets.zero,
 }) {
   const double radius = 48;
 

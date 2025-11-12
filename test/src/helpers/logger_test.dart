@@ -67,6 +67,6 @@ void main() {
   test('logVerbose should call log with Level.trace', () {
     const message = 'Verbose message';
     logVerbose(message);
-    verify(mockLogger.log(Level.verbose, message)).called(1);
+    verify(mockLogger.log(Level.trace, message)).called(1);
   });
 }
