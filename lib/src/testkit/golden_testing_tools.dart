@@ -32,7 +32,7 @@ class BcGoldenCapture {
     String description,
     Future<void> Function(WidgetTester) test, {
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
   }) {
     setLogLevel(logLevel);
 
@@ -88,7 +88,7 @@ class BcGoldenCapture {
     String description,
     List<GoldenStep> steps,
     GoldenCaptureConfig config, {
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
     bool shouldUseRealShadows = true,
   }) {
     setLogLevel(logLevel);
@@ -176,7 +176,7 @@ class BcGoldenCapture {
 
           await expectLater(
             combinedImage,
-            matchesGoldenFile('goldens/${config.testName}_flow.png'),
+            matchesGoldenFile('goldens/${config.testName}.png'),
           );
         });
       },
@@ -201,17 +201,20 @@ class BcGoldenCapture {
   @isTest
   static void animation(
     String description,
-    Widget widget,
+    Widget Function() widgetBuilder,
     GoldenAnimationConfig config, {
     Future<void> Function(WidgetTester)? animationSetup,
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.nothing,
+    Level logLevel = Level.off,
   }) {
     setLogLevel(logLevel);
 
     testWidgets(
       description,
       (widgetTester) async {
+        if (config.device != null) {
+          widgetTester.configureWindow(config.device!);
+        }
         //ignore: always_declare_return_types
         body() async {
           logDebug('[golden][animation] Starting animation test: $description');
@@ -227,25 +230,28 @@ class BcGoldenCapture {
 
           try {
             logDebug('[golden][animation] Setting up animation capture...');
+            final widget = widgetBuilder();
 
-            final combinedImage = await widgetTester.captureAnimation(
-              TestBase.appGoldenTest(
-                widget: widget,
-                key: GlobalKey(),
-              ),
-              config,
-              animationSetup,
-            );
+            await widgetTester.runAsync(() async {
+              final combinedImage = await widgetTester.captureAnimation(
+                TestBase.appGoldenTest(
+                  widget: widget,
+                  key: GlobalKey(),
+                ),
+                config,
+                animationSetup,
+              );
 
-            logDebug('[golden][animation] Comparing with golden file...');
-            final testPath =
-                (goldenFileComparator as LocalFileComparator).basedir.path;
-            await localFileComparator(testPath);
+              logDebug('[golden][animation] Comparing with golden file...');
+              final testPath =
+                  (goldenFileComparator as LocalFileComparator).basedir.path;
+              await localFileComparator(testPath);
 
-            await expectLater(
-              combinedImage,
-              matchesGoldenFile('goldens/${config.testName}_animation.png'),
-            );
+              await expectLater(
+                combinedImage,
+                matchesGoldenFile('goldens/${config.testName}_animation.png'),
+              );
+            });
 
             logDebug(
               '[golden][animation] ✓ Animation test completed: $description',
@@ -255,7 +261,7 @@ class BcGoldenCapture {
           }
         }
 
-        await widgetTester.runAsync(body);
+        await body();
       },
       tags: ['golden'],
     );
@@ -349,12 +355,12 @@ Future<void> bcWidgetMatchesImage({
 /// * [targetPlatform] If it's either Android or iOS.
 /// * [safeAreaPadding] Padding used by the device in the safe areas.
 WindowConfigData bcCustomWindowConfigData({
-  required name,
-  required size,
-  required pixelDensity,
-  targetPlatform = TargetPlatform.iOS,
-  borderRadius,
-  safeAreaPadding = EdgeInsets.zero,
+  required String name,
+  required Size size,
+  required double pixelDensity,
+  TargetPlatform targetPlatform = TargetPlatform.iOS,
+  BorderRadius? borderRadius,
+  EdgeInsets safeAreaPadding = EdgeInsets.zero,
 }) {
   const double radius = 48;
 

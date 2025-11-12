@@ -23,14 +23,14 @@ void log(
   Object? error,
   StackTrace? stackTrace,
 }) {
-  logger.log(level, message, error, stackTrace);
+  logger.log(level, message, error: error, stackTrace: stackTrace);
 }
 
 void logDebug(String message) => log(Level.debug, message);
 void logInfo(String message) => log(Level.info, message);
 void logWarning(String message) => log(Level.warning, message);
 void logError(String message) => log(Level.error, message);
-void logVerbose(String message) => log(Level.verbose, message);
+void logVerbose(String message) => log(Level.trace, message);
 
 void logException(Object error, [StackTrace? stackTrace]) {
   log(Level.error, 'Exception', error: error, stackTrace: stackTrace);

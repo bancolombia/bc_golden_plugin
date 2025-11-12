@@ -1,4 +1,10 @@
 # Changelog
+## 2.0.0-alpha.4
+- Deprecated `bc_golden_test`
+- Added `BcGoldenDevice`.
+- Added `animations` support.
+- Added `multiple screens` support.
+
 ## 1.5.0
 - Update to flutter `>= 3.27.0`.
 - Minor patch fixes.
