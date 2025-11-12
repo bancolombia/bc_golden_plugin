@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.0-alpha.5
+- Reverted `logger` to `1.0.0`.
+
 ## 2.0.0-alpha.4
 - Deprecated `bc_golden_test`
 - Added `BcGoldenDevice`.

@@ -32,7 +32,7 @@ class BcGoldenCapture {
     String description,
     Future<void> Function(WidgetTester) test, {
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.off,
+    Level logLevel = Level.nothing,
   }) {
     setLogLevel(logLevel);
 
@@ -88,7 +88,7 @@ class BcGoldenCapture {
     String description,
     List<GoldenStep> steps,
     GoldenCaptureConfig config, {
-    Level logLevel = Level.off,
+    Level logLevel = Level.nothing,
     bool shouldUseRealShadows = true,
   }) {
     setLogLevel(logLevel);
@@ -205,7 +205,7 @@ class BcGoldenCapture {
     GoldenAnimationConfig config, {
     Future<void> Function(WidgetTester)? animationSetup,
     bool shouldUseRealShadows = true,
-    Level logLevel = Level.off,
+    Level logLevel = Level.nothing,
   }) {
     setLogLevel(logLevel);
 
