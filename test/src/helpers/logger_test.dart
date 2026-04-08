@@ -36,7 +36,7 @@ void main() {
 
     log(Level.info, message, error: error, stackTrace: stackTrace);
     verify(
-      mockLogger.log(Level.info, message, error, stackTrace),
+      mockLogger.log(Level.info, message, error: error, stackTrace: stackTrace),
     ).called(1);
   });
 
