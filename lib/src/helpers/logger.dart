@@ -23,7 +23,7 @@ void log(
   Object? error,
   StackTrace? stackTrace,
 }) {
-  logger.log(level, message, error, stackTrace);
+  logger.log(level, message, error: error, stackTrace: stackTrace);
 }
 
 void logDebug(String message) => log(Level.debug, message);
