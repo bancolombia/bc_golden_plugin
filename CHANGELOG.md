@@ -1,4 +1,10 @@
 # Changelog
+## 2.0.0
+- Updated `logger` to `2.7.0`.
+- Updated `file` to `7.0.1`.
+- Updated `flutter_lints` to `6.0.0`.
+- Updated `dart_code_linter` to `4.0.2`.
+
 ## 2.0.0-alpha.5
 - Reverted `logger` to `1.0.0`.
 
