@@ -24,10 +24,10 @@ void main() {
 
     testWidgets('Test iPhone 16 Pro Max window config data', (tester) async {
       expect(GoldenDeviceData.iPhone16ProMax.name, 'iPhone 16 Pro Max');
-      expect(GoldenDeviceData.iPhone16ProMax.size, const Size(1320, 2868));
-      expect(GoldenDeviceData.iPhone16ProMax.pixelDensity, 460.0);
+      expect(GoldenDeviceData.iPhone16ProMax.size, const Size(440, 956));
+      expect(GoldenDeviceData.iPhone16ProMax.pixelDensity, 3.0);
       expect(
-          GoldenDeviceData.iPhone16ProMax.keyboardSize, const Size(1320, 302));
+          GoldenDeviceData.iPhone16ProMax.keyboardSize, const Size(440, 302));
       expect(GoldenDeviceData.iPhone16ProMax.borderRadius,
           BorderRadius.circular(48));
       expect(
@@ -36,9 +36,9 @@ void main() {
 
     testWidgets('Test Galaxy S25 window config data', (tester) async {
       expect(GoldenDeviceData.galaxyS25.name, 'Galaxy S25');
-      expect(GoldenDeviceData.galaxyS25.size, const Size(1080, 2340));
-      expect(GoldenDeviceData.galaxyS25.pixelDensity, 416.0);
-      expect(GoldenDeviceData.galaxyS25.keyboardSize, const Size(1080, 300));
+      expect(GoldenDeviceData.galaxyS25.size, const Size(360, 780));
+      expect(GoldenDeviceData.galaxyS25.pixelDensity, 3.0);
+      expect(GoldenDeviceData.galaxyS25.keyboardSize, const Size(360, 300));
       expect(
           GoldenDeviceData.galaxyS25.borderRadius, BorderRadius.circular(24));
       expect(GoldenDeviceData.galaxyS25.targetPlatform, TargetPlatform.android);
@@ -55,10 +55,9 @@ void main() {
 
     testWidgets('Test Nothing Phone (3) window config data', (tester) async {
       expect(GoldenDeviceData.nothingPhone3.name, 'Nothing Phone (3)');
-      expect(GoldenDeviceData.nothingPhone3.size, const Size(1260, 2800));
-      expect(GoldenDeviceData.nothingPhone3.pixelDensity, 460.0);
-      expect(
-          GoldenDeviceData.nothingPhone3.keyboardSize, const Size(1260, 300));
+      expect(GoldenDeviceData.nothingPhone3.size, const Size(420, 933));
+      expect(GoldenDeviceData.nothingPhone3.pixelDensity, 3.0);
+      expect(GoldenDeviceData.nothingPhone3.keyboardSize, const Size(420, 300));
       expect(
         GoldenDeviceData.nothingPhone3.borderRadius,
         BorderRadius.circular(32),
@@ -71,10 +70,10 @@ void main() {
 
     testWidgets('Test Android FHD+ window config data', (tester) async {
       expect(GoldenDeviceData.androidFHDplus.name, 'Android FHD+ (1080×2400)');
-      expect(GoldenDeviceData.androidFHDplus.size, const Size(1080, 2400));
-      expect(GoldenDeviceData.androidFHDplus.pixelDensity, 400.0);
+      expect(GoldenDeviceData.androidFHDplus.size, const Size(360, 800));
+      expect(GoldenDeviceData.androidFHDplus.pixelDensity, 3.0);
       expect(
-          GoldenDeviceData.androidFHDplus.keyboardSize, const Size(1080, 300));
+          GoldenDeviceData.androidFHDplus.keyboardSize, const Size(360, 300));
       expect(GoldenDeviceData.androidFHDplus.borderRadius, BorderRadius.zero);
       expect(
         GoldenDeviceData.androidFHDplus.targetPlatform,
@@ -85,10 +84,10 @@ void main() {
     testWidgets('Test Standard iPhone window config data', (tester) async {
       expect(
           GoldenDeviceData.iPhoneStandard.name, 'Standard iPhone (1170×2532)');
-      expect(GoldenDeviceData.iPhoneStandard.size, const Size(1170, 2532));
-      expect(GoldenDeviceData.iPhoneStandard.pixelDensity, 460.0);
+      expect(GoldenDeviceData.iPhoneStandard.size, const Size(390, 844));
+      expect(GoldenDeviceData.iPhoneStandard.pixelDensity, 3.0);
       expect(
-          GoldenDeviceData.iPhoneStandard.keyboardSize, const Size(1170, 300));
+          GoldenDeviceData.iPhoneStandard.keyboardSize, const Size(390, 300));
       expect(GoldenDeviceData.iPhoneStandard.borderRadius, BorderRadius.zero);
       expect(
           GoldenDeviceData.iPhoneStandard.targetPlatform, TargetPlatform.iOS);
@@ -96,10 +95,10 @@ void main() {
 
     testWidgets('Test Android QHD+ window config data', (tester) async {
       expect(GoldenDeviceData.androidQHDplus.name, 'Android QHD+ (1440×3200)');
-      expect(GoldenDeviceData.androidQHDplus.size, const Size(1440, 3200));
-      expect(GoldenDeviceData.androidQHDplus.pixelDensity, 513.0);
+      expect(GoldenDeviceData.androidQHDplus.size, const Size(360, 800));
+      expect(GoldenDeviceData.androidQHDplus.pixelDensity, 4.0);
       expect(
-          GoldenDeviceData.androidQHDplus.keyboardSize, const Size(1440, 300));
+          GoldenDeviceData.androidQHDplus.keyboardSize, const Size(360, 300));
       expect(
         GoldenDeviceData.androidQHDplus.borderRadius,
         BorderRadius.circular(24),
@@ -122,15 +121,15 @@ void main() {
     test('iPhone 16 Pro Max should calculate correct physical size', () {
       final physicalSize = GoldenDeviceData.iPhone16ProMax.physicalSize;
 
-      expect(physicalSize.width, equals(1320 * 460.0));
-      expect(physicalSize.height, equals(2868 * 460.0));
+      expect(physicalSize.width, equals(440 * 3.0));
+      expect(physicalSize.height, equals(956 * 3.0));
     });
 
     test('Galaxy S25 should calculate correct physical size', () {
       final physicalSize = GoldenDeviceData.galaxyS25.physicalSize;
 
-      expect(physicalSize.width, equals(1080 * 416.0));
-      expect(physicalSize.height, equals(2340 * 416.0));
+      expect(physicalSize.width, equals(360 * 3.0));
+      expect(physicalSize.height, equals(780 * 3.0));
     });
 
     test('iPad Pro should calculate correct physical size', () {
@@ -163,7 +162,7 @@ void main() {
     test('Galaxy S25 should calculate correct view insets', () {
       final viewInsets = GoldenDeviceData.galaxyS25.viewInsets;
 
-      expect(viewInsets.bottom, equals(300 * 416.0));
+      expect(viewInsets.bottom, equals(300 * 3.0));
       expect(viewInsets.top, equals(0));
       expect(viewInsets.left, equals(0));
       expect(viewInsets.right, equals(0));
@@ -201,10 +200,10 @@ void main() {
     test('iPhone 16 Pro Max should have correct padding', () {
       final padding = GoldenDeviceData.iPhone16ProMax.padding;
 
-      expect(padding.top, equals(0 * 460.0));
-      expect(padding.bottom, equals(34 * 460.0));
-      expect(padding.left, equals(0 * 460.0));
-      expect(padding.right, equals(0 * 460.0));
+      expect(padding.top, equals(0 * 3.0));
+      expect(padding.bottom, equals(34 * 3.0));
+      expect(padding.left, equals(0 * 3.0));
+      expect(padding.right, equals(0 * 3.0));
     });
 
     test('iPad Pro should have correct padding', () {

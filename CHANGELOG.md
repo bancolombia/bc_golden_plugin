@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.1
+- Update device resolutions.
+
 ## 2.0.0
 - Updated `logger` to `2.7.0`.
 - Updated `file` to `7.0.1`.
