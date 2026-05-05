@@ -375,11 +375,26 @@ WindowConfigData bcCustomWindowConfigData({
 }
 
 /// ## convertToGolden
-/// This function is intended to remove the package parameter from the icons to
-/// succesfully render in test.
+/// Strips the `fontPackage` from an [IconData] so it resolves against a font
+/// registered under its raw family name (e.g. `BdsIcons` instead of
+/// `packages/bds/BdsIcons`).
 ///
-///i.e: BdsFunctionalIcons.HOME.convertToGolden().
+/// Since [loadAppFonts] now registers every font under all of its plausible
+/// aliases (raw family name and `packages/<pkg>/<family>`), this extension
+/// is generally **no longer required**. It is kept for backwards
+/// compatibility and for the rare case where a custom font loader registers
+/// fonts under a single name.
+///
+/// In particular, this extension does **not** help when the [IconData] is
+/// built inside a component, because the test
+/// has no way to apply the conversion. For those cases just calling
+/// [loadAppFonts] is enough — the component's `Icon` will resolve the font
+/// correctly against the prefixed alias automatically registered by
+/// [loadAppFonts].
+///
+/// Example: `BdsFunctionalIcons.HOME.convertToGolden()`.
 extension IconExtension on IconData {
+  @Deprecated('Use loadAppFonts instead')
   IconData convertToGolden() {
     return IconData(
       codePoint,
