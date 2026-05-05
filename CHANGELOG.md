@@ -1,6 +1,7 @@
 # Changelog
 ## 2.0.1
 - Update device resolutions.
+- Update asset loader.
 
 ## 2.0.0
 - Updated `logger` to `2.7.0`.

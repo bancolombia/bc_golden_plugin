@@ -252,4 +252,127 @@ void main() {
       expect(result, equals('packages/first_package/TestFont'));
     });
   });
+
+  group('fontFamilyAliases', () {
+    test('returns empty set when font definition has no family', () {
+      const fontDefinition = <String, dynamic>{};
+
+      final result = fontFamilyAliases(fontDefinition);
+
+      expect(result, isEmpty);
+    });
+
+    test('returns only the raw name for overridable system fonts', () {
+      const fontDefinition = <String, dynamic>{
+        'family': 'Roboto',
+      };
+
+      final result = fontFamilyAliases(fontDefinition);
+
+      expect(result, equals({'Roboto'}));
+    });
+
+    test(
+      'registers under both the raw family and the packages/<pkg>/<family> '
+      'alias when the font ships from a package',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'BdsIcons',
+          'fonts': [
+            {'asset': 'packages/bds/fonts/BdsIcons.ttf'},
+          ],
+        };
+
+        final result = fontFamilyAliases(fontDefinition);
+
+        expect(
+          result,
+          equals({'BdsIcons', 'packages/bds/BdsIcons'}),
+        );
+      },
+    );
+
+    test('registers a packages/-prefixed family under both prefixed and raw',
+        () {
+      const fontDefinition = <String, dynamic>{
+        'family': 'packages/bds/BdsIcons',
+      };
+
+      final result = fontFamilyAliases(fontDefinition);
+
+      expect(
+        result,
+        equals({'packages/bds/BdsIcons', 'BdsIcons'}),
+      );
+    });
+
+    test(
+      'does not duplicate the raw alias for an overridable family even when '
+      'it appears as a packages/ prefix',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'packages/some_package/Roboto',
+        };
+
+        final result = fontFamilyAliases(fontDefinition);
+
+        expect(result, equals({'packages/some_package/Roboto'}));
+      },
+    );
+
+    test('returns the raw family only when no asset references a package', () {
+      const fontDefinition = <String, dynamic>{
+        'family': 'MyCustomFont',
+        'fonts': [
+          {'asset': 'fonts/MyCustomFont.ttf'},
+        ],
+      };
+
+      final result = fontFamilyAliases(fontDefinition);
+
+      expect(result, equals({'MyCustomFont'}));
+    });
+
+    test(
+      'aliases each distinct package referenced by the font asset paths',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'MultiFont',
+          'fonts': [
+            {'asset': 'fonts/MultiFont-Regular.ttf'},
+            {'asset': 'packages/pkg_a/fonts/MultiFont-Bold.ttf'},
+            {'asset': 'packages/pkg_b/fonts/MultiFont-Italic.ttf'},
+          ],
+        };
+
+        final result = fontFamilyAliases(fontDefinition);
+
+        expect(
+          result,
+          equals({
+            'MultiFont',
+            'packages/pkg_a/MultiFont',
+            'packages/pkg_b/MultiFont',
+          }),
+        );
+      },
+    );
+
+    test('tolerates null assets in font types', () {
+      const fontDefinition = <String, dynamic>{
+        'family': 'TestFont',
+        'fonts': [
+          {'asset': null},
+          {'asset': 'packages/my_pkg/fonts/TestFont.ttf'},
+        ],
+      };
+
+      final result = fontFamilyAliases(fontDefinition);
+
+      expect(
+        result,
+        equals({'TestFont', 'packages/my_pkg/TestFont'}),
+      );
+    });
+  });
 }
