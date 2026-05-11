@@ -98,5 +98,12 @@ void main() {
       await loadConfiguration();
       expect(() async => await loadConfiguration(), returnsNormally);
     });
+
+    test('accepts currentPackage parameter without throwing', () async {
+      expect(
+        () async => await loadConfiguration(currentPackage: 'bc_golden_plugin'),
+        returnsNormally,
+      );
+    });
   });
 }

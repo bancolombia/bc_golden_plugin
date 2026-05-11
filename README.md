@@ -64,6 +64,26 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 ```
 Or you can also do it by each tests case if you want.
 
+### Loading icon fonts that ship inside the package under test
+
+When the test runs from inside a Flutter package whose own pubspec
+declares an icon font (and that icon font is referenced via
+`IconData(..., fontPackage: '<thisPackageName>')`), pass
+`currentPackage` to `loadConfiguration` so the font is also registered
+under the `packages/<thisPackageName>/<family>` alias that `Icon` looks
+up. Without it, the icons render as empty squares (missing-glyph
+placeholders) in the goldens because the manifest entry uses a local
+path (no `packages/...` prefix) and the lookup name doesn't match.
+
+```dart
+await loadConfiguration(currentPackage: 'package_name');
+```
+
+This is only needed when the test runs from inside the package itself.
+Consumers of that package don't need to set it: their
+`FontManifest.json` already lists the font with the `packages/<pkg>/...`
+prefix and `loadAppFonts` derives the alias automatically.
+
 ## Window Configuration | Devices 📱
 The following are the windows configurations that are available in the package to simulate a physical device:
 

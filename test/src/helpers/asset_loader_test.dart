@@ -374,5 +374,108 @@ void main() {
         equals({'TestFont', 'packages/my_pkg/TestFont'}),
       );
     });
+
+    test(
+      'adds packages/<currentPackage>/<family> alias for local fonts when '
+      'currentPackage is provided',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'bc-icons',
+          'fonts': [
+            {'asset': 'lib/assets/icons/bc-icons.ttf'},
+          ],
+        };
+
+        final result = fontFamilyAliases(
+          fontDefinition,
+          currentPackage: 'bds_mobile',
+        );
+
+        expect(
+          result,
+          equals({'bc-icons', 'packages/bds_mobile/bc-icons'}),
+        );
+      },
+    );
+
+    test(
+      'currentPackage alias coexists with packages/ aliases derived from '
+      'asset paths',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'MultiFont',
+          'fonts': [
+            {'asset': 'fonts/MultiFont-Regular.ttf'},
+            {'asset': 'packages/pkg_a/fonts/MultiFont-Bold.ttf'},
+          ],
+        };
+
+        final result = fontFamilyAliases(
+          fontDefinition,
+          currentPackage: 'host_pkg',
+        );
+
+        expect(
+          result,
+          equals({
+            'MultiFont',
+            'packages/pkg_a/MultiFont',
+            'packages/host_pkg/MultiFont',
+          }),
+        );
+      },
+    );
+
+    test(
+      'does not inject currentPackage alias for system overridable fonts',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'Roboto',
+        };
+
+        final result = fontFamilyAliases(
+          fontDefinition,
+          currentPackage: 'bds_mobile',
+        );
+
+        expect(result, equals({'Roboto'}));
+      },
+    );
+
+    test(
+      'does not inject currentPackage alias when family already has '
+      'packages/ prefix',
+      () {
+        const fontDefinition = <String, dynamic>{
+          'family': 'packages/other_pkg/CustomFont',
+        };
+
+        final result = fontFamilyAliases(
+          fontDefinition,
+          currentPackage: 'bds_mobile',
+        );
+
+        expect(
+          result,
+          equals({'packages/other_pkg/CustomFont', 'CustomFont'}),
+        );
+      },
+    );
+
+    test('treats empty currentPackage as if not provided', () {
+      const fontDefinition = <String, dynamic>{
+        'family': 'bc-icons',
+        'fonts': [
+          {'asset': 'lib/assets/icons/bc-icons.ttf'},
+        ],
+      };
+
+      final result = fontFamilyAliases(
+        fontDefinition,
+        currentPackage: '',
+      );
+
+      expect(result, equals({'bc-icons'}));
+    });
   });
 }

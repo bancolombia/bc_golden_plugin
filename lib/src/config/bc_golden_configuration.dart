@@ -33,7 +33,16 @@ class BcGoldenConfiguration {
       BcGoldenConfiguration._();
 }
 
-Future<void> loadConfiguration() async {
-  await loadAppFonts();
+/// Loads the runtime configuration required by the golden tests.
+///
+/// * [currentPackage] When the test runs from inside a Flutter package
+///   that ships its own font assets with local paths (e.g. icon fonts
+///   declared in the package's own `pubspec.yaml` and consumed via
+///   `IconData(..., fontPackage: '<currentPackage>')`), pass the package
+///   name so that the fonts are also registered under the
+///   `packages/<currentPackage>/<family>` alias. See [loadAppFonts] for
+///   details.
+Future<void> loadConfiguration({String? currentPackage}) async {
+  await loadAppFonts(currentPackage: currentPackage);
   await loadMaterialIconFont();
 }
