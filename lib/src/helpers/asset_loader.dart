@@ -76,7 +76,16 @@ Future<void> loadMaterialIconFont() async {
 /// `fontPackage` or not. This is what allows components that internally map
 /// an enum to `IconData(..., fontPackage: '<pkg>')` to render correctly in
 /// goldens without callers having to apply [IconExtension.convertToGolden].
-Future<void> loadAppFonts() async {
+///
+/// * [currentPackage] When the test runs from inside a Flutter package whose
+///   own fonts are listed in the manifest with local paths (i.e. without the
+///   `packages/<pkg>/...` prefix), pass the package name here. The font will
+///   additionally be registered under `packages/<currentPackage>/<family>`,
+///   so an `IconData(..., fontPackage: '<currentPackage>')` defined inside
+///   that same package can resolve its glyphs in tests. Has no effect on
+///   fonts that already include a `packages/...` prefix or that come from
+///   another package.
+Future<void> loadAppFonts({String? currentPackage}) async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final fontManifest = await rootBundle.loadStructuredData<Iterable<dynamic>>(
@@ -88,7 +97,8 @@ Future<void> loadAppFonts() async {
     final List<dynamic>? fonts = font['fonts'] as List<dynamic>?;
     if (fonts == null) continue;
 
-    for (final String alias in fontFamilyAliases(font)) {
+    for (final String alias
+        in fontFamilyAliases(font, currentPackage: currentPackage)) {
       final fontLoader = FontLoader(alias);
       for (final Map<String, dynamic> fontType in fonts) {
         final String? asset = fontType['asset'];
@@ -112,8 +122,18 @@ Future<void> loadAppFonts() async {
 /// derive from the manifest entry: the raw family name (when it isn't a
 /// system font alias), and a `packages/<pkg>/<family>` variant for every
 /// distinct package referenced in the asset paths.
+///
+/// * [currentPackage] When the manifest entry uses a local asset path
+///   (no `packages/<pkg>/...` prefix), this value lets the caller declare
+///   which package owns the font so that an additional
+///   `packages/<currentPackage>/<family>` alias is generated. This covers
+///   the case where a package is being tested from inside itself and its
+///   own `IconData` definitions reference it via `fontPackage`.
 @visibleForTesting
-Set<String> fontFamilyAliases(Map<String, dynamic> fontDefinition) {
+Set<String> fontFamilyAliases(
+  Map<String, dynamic> fontDefinition, {
+  String? currentPackage,
+}) {
   if (!fontDefinition.containsKey('family')) {
     return const <String>{};
   }
@@ -149,6 +169,16 @@ Set<String> fontFamilyAliases(Map<String, dynamic> fontDefinition) {
         }
       }
     }
+  }
+
+  // When the font is owned by the package currently under test, also expose
+  // it under the `packages/<currentPackage>/<family>` alias so that an
+  // `IconData(..., fontPackage: '<currentPackage>')` declared in that same
+  // package can resolve its glyphs. This complements the rule above for
+  // cases where the manifest lists local asset paths (i.e. tests running
+  // from inside the package itself).
+  if (currentPackage != null && currentPackage.isNotEmpty) {
+    aliases.add('packages/$currentPackage/$fontFamily');
   }
 
   return aliases;

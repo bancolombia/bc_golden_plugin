@@ -60,6 +60,26 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 }
 ```
 
+#### Loading icon fonts that ship inside the package under test
+
+When the test is run from inside a Flutter package whose own pubspec
+declares an icon font (and that icon font is referenced by `IconData`
+with `fontPackage: '<thisPackageName>'`), pass `currentPackage` to
+`loadConfiguration` so the font is also registered under the
+`packages/<thisPackageName>/<family>` alias that `Icon` will look up.
+Without it, you'll see icons rendered as empty squares (missing-glyph
+placeholders) in the goldens.
+
+```dart
+await loadConfiguration(currentPackage: 'package_name');
+```
+
+This is only needed when the manifest entry uses a local asset path
+(no `packages/...` prefix) — typically the case when running tests
+from inside the package itself. Consumers of that package don't need
+to set it, because their `FontManifest.json` already lists the font
+under `packages/<pkg>/...`.
+
 ### 3. Test File Naming Convention
 
 Golden test files MUST follow this pattern:

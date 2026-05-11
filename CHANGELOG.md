@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.2
+- Add `currentPackage` parameter to `loadConfiguration` function.
+
 ## 2.0.1
 - Update device resolutions.
 - Update asset loader.
