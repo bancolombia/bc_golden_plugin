@@ -1,7 +1,7 @@
 /// A library for the bc_golden_plugin.
 ///
 /// This library provides configuration and testing tools for the bc_golden_plugin.
-library bc_golden_plugin;
+library;
 
 export 'package:logger/logger.dart';
 
