@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.3
+- Add `settleAfterPump` in `bcWidgetMatchesImage`.
+
 ## 2.0.2
 - Add `currentPackage` parameter to `loadConfiguration` function.
 

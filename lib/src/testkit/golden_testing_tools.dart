@@ -307,6 +307,13 @@ void bcGoldenTest(
 /// test with phone screen specifications.
 /// * [customTheme] (optional) if set, it will override the default theme
 /// given in the BcGoldenConfiguration for one test only.
+/// * [settleAfterPump] (optional) if set, `pumpAndSettle` will be called
+/// with this duration after rendering the widget. Use this for widgets with
+/// implicit or explicit animations (e.g. `TweenAnimationBuilder`,
+/// `AnimatedContainer`, `AnimatedOpacity`) that are not covered by
+/// [awaitImages], so the golden capture reflects the settled state instead
+/// of frame 0. Defaults to `null`, which preserves the previous behavior
+/// (no settle).
 Future<void> bcWidgetMatchesImage({
   required String imageName,
   required Widget widget,
@@ -316,6 +323,7 @@ Future<void> bcWidgetMatchesImage({
   double? textScaleFactor,
   WindowConfigData? device,
   ThemeData? customTheme,
+  Duration? settleAfterPump,
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
@@ -336,6 +344,10 @@ Future<void> bcWidgetMatchesImage({
   );
 
   await tester.awaitImages();
+
+  if (settleAfterPump != null) {
+    await tester.pumpAndSettle(settleAfterPump);
+  }
 
   await loadAppFonts();
 

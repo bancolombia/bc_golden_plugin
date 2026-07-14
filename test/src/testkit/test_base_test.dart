@@ -1,5 +1,4 @@
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
-import 'package:bc_golden_plugin/src/testkit/test_base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
