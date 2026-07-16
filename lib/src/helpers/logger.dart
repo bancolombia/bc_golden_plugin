@@ -1,21 +1,17 @@
-import 'package:logger/logger.dart';
+import 'package:flutter/foundation.dart';
 
-final LogPrinter _prettyPrinter = PrettyPrinter(
-  methodCount: 0,
-  errorMethodCount: 5,
-  lineLength: 50,
-  colors: true,
-  printEmojis: true,
-);
+/// ## Level
+/// Logging levels for the plugin's internal logger, ordered from most
+/// verbose ([Level.verbose]) to fully disabled ([Level.nothing]).
+enum Level { verbose, debug, info, warning, error, nothing }
 
-Logger logger = Logger(
-  level: Level.debug,
-  printer: _prettyPrinter,
-);
+Level _currentLevel = Level.nothing;
 
 void setLogLevel(Level level) {
-  logger = Logger(level: level, printer: _prettyPrinter);
+  _currentLevel = level;
 }
+
+bool _shouldLog(Level level) => level.index >= _currentLevel.index;
 
 void log(
   Level level,
@@ -23,7 +19,13 @@ void log(
   Object? error,
   StackTrace? stackTrace,
 }) {
-  logger.log(level, message, error: error, stackTrace: stackTrace);
+  if (!_shouldLog(level)) return;
+
+  final buffer = StringBuffer('[${level.name.toUpperCase()}] $message');
+  if (error != null) buffer.write('\nError: $error');
+  if (stackTrace != null) buffer.write('\n$stackTrace');
+
+  debugPrint(buffer.toString());
 }
 
 void logDebug(String message) => log(Level.debug, message);

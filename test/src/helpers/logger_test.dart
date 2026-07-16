@@ -1,72 +1,90 @@
-// ignore_for_file: missing-test-assertion
 import 'package:bc_golden_plugin/src/helpers/logger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:logger/logger.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-
-@GenerateNiceMocks([MockSpec<Logger>()])
-import 'logger_test.mocks.dart';
 
 void main() {
-  late MockLogger mockLogger;
+  late DebugPrintCallback originalDebugPrint;
+  late List<String> prints;
 
   setUp(() {
-    mockLogger = MockLogger();
-    logger = mockLogger;
+    originalDebugPrint = debugPrint;
+    prints = [];
+    debugPrint = (String? message, {int? wrapWidth}) {
+      if (message != null) prints.add(message);
+    };
   });
 
   tearDown(() {
-    logger = Logger(
-      level: Level.debug,
-      printer: PrettyPrinter(
-        methodCount: 0,
-        errorMethodCount: 5,
-        lineLength: 50,
-        colors: true,
-        printEmojis: true,
-      ),
-    );
+    debugPrint = originalDebugPrint;
+    setLogLevel(Level.nothing);
   });
 
-  test('log should call Logger.log with the correct parameters', () {
-    const message = 'Test log';
+  test('log does not print when level is below the current log level', () {
+    setLogLevel(Level.error);
+    log(Level.debug, 'Debug message');
+    expect(prints, isEmpty);
+  });
+
+  test('log prints when level is at or above the current log level', () {
+    setLogLevel(Level.debug);
+    log(Level.info, 'Info message');
+    expect(prints, hasLength(1));
+    expect(prints.single, contains('Info message'));
+  });
+
+  test('log includes error and stackTrace when provided', () {
+    setLogLevel(Level.debug);
     final error = Exception('Test error');
     final stackTrace = StackTrace.current;
 
-    log(Level.info, message, error: error, stackTrace: stackTrace);
-    verify(
-      mockLogger.log(Level.info, message, error: error, stackTrace: stackTrace),
-    ).called(1);
+    log(Level.error, 'Failure', error: error, stackTrace: stackTrace);
+
+    expect(prints.single, contains('Failure'));
+    expect(prints.single, contains(error.toString()));
+    expect(prints.single, contains(stackTrace.toString()));
   });
 
-  test('logDebug should call log with Level.debug', () {
-    const message = 'Debug message';
-    logDebug(message);
-    verify(mockLogger.log(Level.debug, message)).called(1);
+  test('logDebug logs at Level.debug', () {
+    setLogLevel(Level.debug);
+    logDebug('Debug message');
+    expect(prints.single, contains('[DEBUG] Debug message'));
   });
 
-  test('logInfo should call log with Level.info', () {
-    const message = 'Info message';
-    logInfo(message);
-    verify(mockLogger.log(Level.info, message)).called(1);
+  test('logInfo logs at Level.info', () {
+    setLogLevel(Level.info);
+    logInfo('Info message');
+    expect(prints.single, contains('[INFO] Info message'));
   });
 
-  test('logWarning should call log with Level.warning', () {
-    const message = 'Warning message';
-    logWarning(message);
-    verify(mockLogger.log(Level.warning, message)).called(1);
+  test('logWarning logs at Level.warning', () {
+    setLogLevel(Level.warning);
+    logWarning('Warning message');
+    expect(prints.single, contains('[WARNING] Warning message'));
   });
 
-  test('logError should call log with Level.error', () {
-    const message = 'Error message';
-    logError(message);
-    verify(mockLogger.log(Level.error, message)).called(1);
+  test('logError logs at Level.error', () {
+    setLogLevel(Level.error);
+    logError('Error message');
+    expect(prints.single, contains('[ERROR] Error message'));
   });
 
-  test('logVerbose should call log with Level.trace', () {
-    const message = 'Verbose message';
-    logVerbose(message);
-    verify(mockLogger.log(Level.verbose, message)).called(1);
+  test('logVerbose logs at Level.verbose', () {
+    setLogLevel(Level.verbose);
+    logVerbose('Verbose message');
+    expect(prints.single, contains('[VERBOSE] Verbose message'));
+  });
+
+  test('logException logs at Level.error with the error attached', () {
+    setLogLevel(Level.error);
+    final error = Exception('Boom');
+    logException(error);
+    expect(prints.single, contains('Exception'));
+    expect(prints.single, contains(error.toString()));
+  });
+
+  test('setLogLevel(nothing) suppresses all logs', () {
+    setLogLevel(Level.nothing);
+    logError('Should not print');
+    expect(prints, isEmpty);
   });
 }

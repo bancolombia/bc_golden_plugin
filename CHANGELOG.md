@@ -1,4 +1,7 @@
 # Changelog
+## 3.0.0
+- **Breaking:** Removed the `logger` dependency to avoid version conflicts with consumers using a different `logger` version. Logging is now handled internally via `debugPrint`, and `Level` is now defined and exported by this package instead of `package:logger`. Existing `logLevel: Level.xxx` usages keep working unchanged; only a direct dependency on `package:logger`'s own `Level` type would need updating.
+
 ## 2.0.3
 - Add `settleAfterPump` in `bcWidgetMatchesImage`.
 
