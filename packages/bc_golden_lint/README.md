@@ -2,7 +2,41 @@
 
 An [`analysis_server_plugin`](https://pub.dev/packages/analysis_server_plugin)
 for [`bc_golden_plugin`](https://pub.dev/packages/bc_golden_plugin) that
-currently provides a single IDE quick assist:
+provides an IDE quick assist and two lint rules.
+
+## Enabling the lint rules
+
+Lint rules from analyzer plugins are disabled by default. Enable them in the
+consuming package's `analysis_options.yaml`:
+
+```yaml
+plugins:
+  bc_golden_lint:
+    path: path/to/bc_golden_lint # or a version constraint, once published
+    diagnostics:
+      golden_image_name_no_extension: true
+      prefer_bc_golden_capture: true
+```
+
+## golden_image_name_no_extension
+
+Flags `bcWidgetMatchesImage(imageName: '...')` calls whose `imageName`
+includes a `.png` extension. `bcWidgetMatchesImage` appends `.png` itself and
+only `assert`s the absence of the extension at runtime, so today this mistake
+surfaces late — only when the golden test actually runs — instead of
+immediately in the IDE.
+
+## prefer_bc_golden_capture
+
+Flags calls to the deprecated `bcGoldenTest` function and offers a quick fix
+that replaces them with `BcGoldenCapture.single`, keeping the arguments
+unchanged (the two functions share an identical parameter list — `bcGoldenTest`
+just forwards to `BcGoldenCapture.single`). Note this overlaps with the
+analyzer's built-in `deprecated_member_use` diagnostic on the same call; the
+rule exists specifically to carry the automatic migration fix, which
+`deprecated_member_use` doesn't offer.
+
+## Convert to separate BcGoldenCapture.single tests (quick assist)
 
 ## Convert to separate BcGoldenCapture.single tests
 

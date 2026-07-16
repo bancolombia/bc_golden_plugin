@@ -3,3 +3,6 @@ include: package:flutter_lints/flutter.yaml
 plugins:
   bc_golden_lint:
     path: ../packages/bc_golden_lint
+    diagnostics:
+      golden_image_name_no_extension: true
+      prefer_bc_golden_capture: true
