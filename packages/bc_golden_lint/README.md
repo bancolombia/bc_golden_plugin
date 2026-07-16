@@ -1,8 +1,8 @@
 # bc_golden_lint
 
-A [`custom_lint`](https://pub.dev/packages/custom_lint) plugin for
-[`bc_golden_plugin`](https://pub.dev/packages/bc_golden_plugin) that currently
-provides a single IDE quick assist:
+An [`analysis_server_plugin`](https://pub.dev/packages/analysis_server_plugin)
+for [`bc_golden_plugin`](https://pub.dev/packages/bc_golden_plugin) that
+currently provides a single IDE quick assist:
 
 ## Convert to separate BcGoldenCapture.single tests
 

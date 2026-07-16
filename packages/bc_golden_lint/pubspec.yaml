@@ -1,19 +1,17 @@
 name: bc_golden_lint
 description: >
-  custom_lint plugin providing an IDE quick assist to convert
+  analysis_server_plugin providing an IDE quick assist to convert
   BcGoldenCapture.multiple(...) calls into independent BcGoldenCapture.single tests.
 version: 0.1.0
 repository: https://github.com/bancolombia/bc_golden_plugin
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.10.0 <4.0.0"
 
 dependencies:
-  analyzer: ^8.4.0
-  analyzer_plugin: ^0.13.10
-  custom_lint_builder: ^0.8.1
-
+  analysis_server_plugin: ">=0.3.3 <0.4.0"
+  analyzer: ">=14.0.0 <15.0.0"
+  analyzer_plugin: ">=0.13.10 <1.0.0"
 dev_dependencies:
-  custom_lint: ^0.8.1
   lints: ^6.1.0
   test: ^1.31.1

@@ -68,7 +68,7 @@ bool isBcGoldenCaptureMultipleInvocation(MethodInvocation node) {
 /// partial rewrite.
 ExtractedMultipleCall? extractMultipleCall(MethodInvocation node) {
   final positional = node.argumentList.arguments
-      .where((argument) => argument is! NamedExpression)
+      .where((argument) => argument is! NamedArgument)
       .toList();
   if (positional.length < 3) return null;
 
@@ -95,12 +95,12 @@ ExtractedMultipleCall? extractMultipleCall(MethodInvocation node) {
   String? logLevelSource;
   String? shouldUseRealShadowsSource;
   for (final named
-      in node.argumentList.arguments.whereType<NamedExpression>()) {
-    switch (named.name.label.name) {
+      in node.argumentList.arguments.whereType<NamedArgument>()) {
+    switch (named.name.lexeme) {
       case 'logLevel':
-        logLevelSource = named.expression.toSource();
+        logLevelSource = named.argumentExpression.toSource();
       case 'shouldUseRealShadows':
-        shouldUseRealShadowsSource = named.expression.toSource();
+        shouldUseRealShadowsSource = named.argumentExpression.toSource();
     }
   }
 
@@ -174,7 +174,7 @@ String generateSingleTestsSource(ExtractedMultipleCall call) {
 /// bare [MethodInvocation] (the shape an *unresolved* parse gives an
 /// unprefixed call like `GoldenStep(...)` before the analyzer can bind it
 /// to a constructor). Returns `null` otherwise.
-ArgumentList? _constructorLikeArguments(Expression expr, String name) {
+ArgumentList? _constructorLikeArguments(Argument expr, String name) {
   if (expr is InstanceCreationExpression) {
     return expr.constructorName.type.name.lexeme == name
         ? expr.argumentList
@@ -227,8 +227,8 @@ String? _widgetExpressionSource(FunctionExpression function) {
 
 Expression? _namedArgExpression(ArgumentList args, String name) {
   for (final argument in args.arguments) {
-    if (argument is NamedExpression && argument.name.label.name == name) {
-      return argument.expression;
+    if (argument is NamedArgument && argument.name.lexeme == name) {
+      return argument.argumentExpression;
     }
   }
   return null;

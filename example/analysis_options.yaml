@@ -1,5 +1,5 @@
 include: package:flutter_lints/flutter.yaml
 
-analyzer:
-  plugins:
-    - custom_lint
+plugins:
+  bc_golden_lint:
+    path: ../packages/bc_golden_lint
