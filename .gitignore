@@ -33,6 +33,7 @@ migrate_working_dir/
 /build/
 /codemagic.yaml
 /pubspec.lock
+packages/bc_golden_lint/pubspec.lock
 /coverage
 /.vscode/
 **/coverage/
