@@ -12,6 +12,12 @@ import '../helpers/logger.dart';
 
 const String _folderPath = 'goldens';
 
+/// How far the fake test clock is advanced after each step in
+/// [BcGoldenCapture.multiple] so that timers left behind by the step
+/// (e.g. delayed futures that cannot be cancelled on dispose) fire
+/// instead of remaining pending between steps or at the end of the test.
+const Duration _pendingTimersFlushTime = Duration(minutes: 1);
+
 /// ## BcGoldenCapture
 /// Unified class for golden testing with single and multiple capture functionality.
 ///
@@ -153,6 +159,8 @@ class BcGoldenCapture {
                 '[flows][multiple] ✓ Captured screenshot for step ${index + 1}/${steps.length}: ${step.stepName}',
               );
             });
+
+            await tester.pump(_pendingTimersFlushTime);
           }
 
           logDebug('[flows][multiple] Combining screenshots...');

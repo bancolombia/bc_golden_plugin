@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
 import 'package:bc_golden_plugin/src/testkit/window_size.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,31 @@ class FakeGoldenStep implements GoldenStep {
   final Future<void> Function(WidgetTester)? setupAction;
   @override
   final Future<void> Function(WidgetTester)? verifyAction;
+}
+
+/// Widget that starts timers on mount, like widgets with animations,
+/// splashes or delayed futures do. Used to reproduce
+/// https://github.com/bancolombia/bc_golden_plugin/issues/35.
+class _TimerStartingBox extends StatefulWidget {
+  const _TimerStartingBox({required this.color});
+
+  final Color color;
+
+  @override
+  State<_TimerStartingBox> createState() => _TimerStartingBoxState();
+}
+
+class _TimerStartingBoxState extends State<_TimerStartingBox> {
+  @override
+  Widget build(BuildContext context) => ColoredBox(color: widget.color);
+
+  @override
+  void initState() {
+    super.initState();
+    // A delayed future cannot be cancelled on dispose, so its internal
+    // timer stays pending unless the test advances the clock past it.
+    unawaited(Future<void>.delayed(const Duration(seconds: 5)));
+  }
 }
 
 void main() {
@@ -92,5 +119,30 @@ void main() {
     ];
 
     BcGoldenCapture.multiple('renders flow and matches golden', steps, config);
+
+    // Regression test for issue #35: widgets that start timers must not
+    // leave them pending between steps or at the end of the test.
+    final timerSteps = <GoldenStep>[
+      GoldenStep(
+        stepName: 'Home',
+        widgetBuilder: () => const _TimerStartingBox(color: Colors.blue),
+      ),
+      GoldenStep(
+        stepName: 'Details',
+        widgetBuilder: () => const _TimerStartingBox(color: Colors.red),
+      ),
+    ];
+
+    BcGoldenCapture.multiple(
+      'does not leak pending timers between steps',
+      timerSteps,
+      const GoldenCaptureConfig(
+        layoutType: CaptureLayoutType.vertical,
+        spacing: 8,
+        maxScreensPerRow: 2,
+        delayBetweenScreens: Duration.zero,
+        testName: 'timer_flow',
+      ),
+    );
   });
 }
