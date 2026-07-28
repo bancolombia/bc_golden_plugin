@@ -57,6 +57,9 @@ class BcGoldenCapture {
             logDebug('[golden][single] Finished golden test: $description');
             debugDisableShadows = initialDebugDisableShadowsValue;
             debugDefaultTargetPlatformOverride = null;
+
+            await widgetTester.pumpWidget(const SizedBox.shrink());
+            await widgetTester.pump(_pendingTimersFlushTime);
           }
         }
 
@@ -162,6 +165,9 @@ class BcGoldenCapture {
 
             await tester.pump(_pendingTimersFlushTime);
           }
+
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pump(_pendingTimersFlushTime);
 
           logDebug('[flows][multiple] Combining screenshots...');
         } finally {
