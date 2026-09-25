@@ -1,12 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
+
 import '../config/bc_golden_configuration.dart';
 
 /// ### LocalFileComparatorWithThreshold
-/// This class is intended to use a custom value of difference acceptance
-/// so it will take the path to the test and if the value is more than
-/// [_kGoldenTestsThreshold] it will fail the test.
-
+/// A [LocalFileComparator] that accepts a configurable difference between the
+/// rendered image and the golden. If the difference is below [threshold]
+/// (a ratio in the range `0..1`), the comparison passes.
+///
+/// This comparator only customizes the *comparison* ([compare]). The
+/// *generation* of goldens ([update], used with `--update-goldens`) always
+/// writes the current render as-is; the [threshold] does NOT apply when
+/// updating. [update] is overridden here only to document that contract
+/// explicitly and to keep behavior consistent if the base implementation
+/// changes.
 class LocalFileComparatorWithThreshold extends LocalFileComparator {
   LocalFileComparatorWithThreshold(
     super.testFile,
@@ -18,7 +26,9 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
 
   final double threshold;
 
-  final int total = 100;
+  /// Multiplier used to express [ComparisonResult.diffPercent] and [threshold]
+  /// as human-readable percentages in log messages.
+  static const int _percentBase = 100;
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
@@ -28,59 +38,89 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
     );
 
     if (result.passed) {
-      // result.dispose();
-
       return true;
     }
 
-    if (!result.passed && result.diffPercent <= threshold) {
+    if (result.diffPercent <= threshold) {
       debugPrint(
-        'A difference of ${result.diffPercent * total}% was found, but it is '
-        'an acceptable value, given that the acceptance threshold is '
-        '${threshold * total}%',
+        'A difference of ${result.diffPercent * _percentBase}% was found, but '
+        'it is an acceptable value, given that the acceptance threshold is '
+        '${threshold * _percentBase}%',
       );
 
       if (bcGoldenConfiguration.shouldCreateFailuresFolder) {
         await generateFailureOutput(result, golden, basedir);
       }
 
-      // result.dispose();
-
       return true;
     }
 
-    if (!result.passed && bcGoldenConfiguration.willFailOnError) {
-      final error = await generateFailureOutput(result, golden, basedir);
+    if (bcGoldenConfiguration.willFailOnError) {
+      final String error = await generateFailureOutput(result, golden, basedir);
       throw FlutterError(error);
     }
 
     debugPrint(
-      'A difference of ${result.diffPercent * total}% was found, but '
+      'A difference of ${result.diffPercent * _percentBase}% was found, but '
       'the willFailOnError option is set to false, so the test passes.',
     );
 
     return !result.passed;
   }
+
+  /// Writes [imageBytes] as the new golden at [golden].
+  ///
+  /// Invoked by the framework when tests run with `--update-goldens`. The
+  /// [threshold] intentionally does not participate here: updating always
+  /// stores the current render verbatim. This override delegates to the base
+  /// implementation and exists to make that contract explicit.
+  @override
+  Future<void> update(Uri golden, Uint8List imageBytes) {
+    return super.update(golden, imageBytes);
+  }
 }
 
 BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 
-/// This is the constant value of the minimum percent of difference in
-/// a test.
-double _kGoldenTestsThreshold =
-    bcGoldenConfiguration.goldenDifferenceThreshold / 100;
-
+/// Installs a [LocalFileComparatorWithThreshold] as the active
+/// [goldenFileComparator], using the tolerance configured in
+/// [BcGoldenConfiguration.goldenDifferenceRatio].
+///
+/// [testUrl] is the path to the current test file (or its directory). The
+/// golden comparator resolves golden paths relative to the test file's
+/// directory, so the file name is preserved and joined using [p.join] instead
+/// of string concatenation for robustness across platforms.
 Future<void> localFileComparator(String testUrl) async {
-  final String fileName = testUrl.split('/').last;
-
-  if (goldenFileComparator is LocalFileComparator) {
-    goldenFileComparator = LocalFileComparatorWithThreshold(
-      Uri.parse('$testUrl/$fileName' '_golden_test.dart'),
-      _kGoldenTestsThreshold,
-    );
-  } else {
-    throw Exception(
-      goldenFileComparator.runtimeType,
-    );
+  if (goldenFileComparator is! LocalFileComparator) {
+    throw Exception(goldenFileComparator.runtimeType);
   }
+
+  final Uri testUri = _resolveTestFileUri(testUrl);
+
+  goldenFileComparator = LocalFileComparatorWithThreshold(
+    testUri,
+    bcGoldenConfiguration.goldenDifferenceRatio,
+  );
+}
+
+/// Builds a robust [Uri] pointing to the test file used as the base for
+/// resolving golden paths.
+///
+/// Accepts either a path to a `*_test.dart` file or a directory. When given a
+/// directory, a synthetic `_golden_test.dart` file name is appended so the
+/// comparator's `basedir` resolves to that directory. Path components are
+/// joined with [p.join] to avoid the fragile string concatenation used
+/// previously.
+Uri _resolveTestFileUri(String testUrl) {
+  final bool looksLikeDartFile = testUrl.endsWith('.dart');
+
+  if (looksLikeDartFile) {
+    return Uri.file(testUrl);
+  }
+
+  final String fileName = p.basename(testUrl);
+  final String syntheticTestFile =
+      p.join(testUrl, '${fileName}_golden_test.dart');
+
+  return Uri.file(syntheticTestFile);
 }

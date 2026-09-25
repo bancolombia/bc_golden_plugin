@@ -144,5 +144,21 @@ void main() {
         testName: 'timer_flow',
       ),
     );
+
+    BcGoldenCapture.multiple(
+      'accepts localization, appWrapper, customTheme and wrapInScaffold',
+      steps,
+      const GoldenCaptureConfig(
+        layoutType: CaptureLayoutType.vertical,
+        spacing: 8,
+        maxScreensPerRow: 2,
+        delayBetweenScreens: Duration.zero,
+        testName: 'sample_flow',
+      ),
+      customTheme: ThemeData(primaryColor: Colors.green),
+      supportedLocales: const <Locale>[Locale('en')],
+      locale: const Locale('en'),
+      wrapInScaffold: false,
+    );
   });
 }
