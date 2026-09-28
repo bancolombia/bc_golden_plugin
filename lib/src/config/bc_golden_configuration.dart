@@ -28,6 +28,7 @@ class BcGoldenConfiguration {
   /// [willFailOnError] indicates whether the process should fail when an error occurs,
   /// defaulting to true.
   bool willFailOnError = true;
+  bool generateFailureOutput = true;
 
   static final BcGoldenConfiguration _bcGoldenConfiguration =
       BcGoldenConfiguration._();
