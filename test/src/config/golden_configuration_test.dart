@@ -87,6 +87,20 @@ void main() {
       expect(configuration.themeProvider, isNotNull);
       expect(configuration.themeProvider, hasLength(0));
     });
+
+    test('should have shouldCreateFailuresFolder enabled by default', () {
+      final configuration = BcGoldenConfiguration();
+
+      expect(configuration.shouldCreateFailuresFolder, isTrue);
+    });
+
+    test('should allow setting shouldCreateFailuresFolder', () {
+      final configuration = BcGoldenConfiguration();
+
+      configuration.shouldCreateFailuresFolder = false;
+
+      expect(configuration.shouldCreateFailuresFolder, isFalse);
+    });
   });
 
   group('loadConfiguration', () {

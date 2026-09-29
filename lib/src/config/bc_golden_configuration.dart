@@ -28,7 +28,11 @@ class BcGoldenConfiguration {
   /// [willFailOnError] indicates whether the process should fail when an error occurs,
   /// defaulting to true.
   bool willFailOnError = true;
-  bool generateFailureOutput = true;
+
+  /// [shouldCreateFailuresFolder] indicates whether the failures folder should
+  /// be created when the percentage difference is less than the configured value.
+  /// defaulting to true.
+  bool shouldCreateFailuresFolder = true;
 
   static final BcGoldenConfiguration _bcGoldenConfiguration =
       BcGoldenConfiguration._();

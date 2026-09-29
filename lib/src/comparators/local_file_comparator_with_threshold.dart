@@ -40,7 +40,7 @@ class LocalFileComparatorWithThreshold extends LocalFileComparator {
         '${threshold * total}%',
       );
 
-      if (bcGoldenConfiguration.generateFailureOutput) {
+      if (bcGoldenConfiguration.shouldCreateFailuresFolder) {
         await generateFailureOutput(result, golden, basedir);
       }
 
