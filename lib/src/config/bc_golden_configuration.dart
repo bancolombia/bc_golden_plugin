@@ -29,6 +29,11 @@ class BcGoldenConfiguration {
   /// defaulting to true.
   bool willFailOnError = true;
 
+  /// [shouldCreateFailuresFolder] indicates whether the failures folder should
+  /// be created when the percentage difference is less than the configured value.
+  /// defaulting to true.
+  bool shouldCreateFailuresFolder = true;
+
   static final BcGoldenConfiguration _bcGoldenConfiguration =
       BcGoldenConfiguration._();
 }
