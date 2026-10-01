@@ -2,6 +2,8 @@ import 'package:bc_golden_plugin/bc_golden_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 void main() {
   testWidgets('renders the widget with size, scale and custom theme',
@@ -161,6 +163,89 @@ void main() {
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.text('own scaffold'), findsOneWidget);
     });
+  });
+
+  group('dialog overlays', () {
+    testWidgets(
+      'with includeOverlays, showDialog is visible and can read themeProvider',
+      (tester) async {
+        // Arrange: register a provider that dialogs must be able to read.
+        final BcGoldenConfiguration configuration = BcGoldenConfiguration();
+        configuration.themeProvider = <SingleChildWidget>[
+          Provider<String>.value(value: 'from-provider'),
+        ];
+        addTearDown(() => configuration.themeProvider = null);
+
+        await tester.pumpWidget(
+          TestBase.appGoldenTest(
+            widget: Builder(
+              builder: (BuildContext context) => ElevatedButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (BuildContext dialogContext) => AlertDialog(
+                    content: Text(dialogContext.read<String>()),
+                  ),
+                ),
+                child: const Text('Abrir'),
+              ),
+            ),
+            width: 200,
+            height: 200,
+            includeOverlays: true,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text('Abrir'));
+        await tester.pumpAndSettle();
+
+        // Assert: dialog is mounted inside the screenshot boundary with
+        // provider access (sibling routes of `home` used to sit outside both).
+        expect(find.text('from-provider'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(RepaintBoundary),
+            matching: find.byType(AlertDialog),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'without includeOverlays, dialog cannot read themeProvider',
+      (tester) async {
+        final BcGoldenConfiguration configuration = BcGoldenConfiguration();
+        configuration.themeProvider = <SingleChildWidget>[
+          Provider<String>.value(value: 'from-provider'),
+        ];
+        addTearDown(() => configuration.themeProvider = null);
+
+        await tester.pumpWidget(
+          TestBase.appGoldenTest(
+            widget: Builder(
+              builder: (BuildContext context) => ElevatedButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (BuildContext dialogContext) => AlertDialog(
+                    content: Text(dialogContext.read<String>()),
+                  ),
+                ),
+                child: const Text('Abrir'),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Abrir'));
+        await tester.pumpAndSettle();
+
+        // Legacy tree: dialog is a sibling route of home, outside MultiProvider.
+        expect(tester.takeException(), isA<ProviderNotFoundException>());
+      },
+    );
   });
 }
 

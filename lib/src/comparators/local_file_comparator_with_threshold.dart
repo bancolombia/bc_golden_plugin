@@ -111,16 +111,30 @@ Future<void> localFileComparator(String testUrl) async {
 /// comparator's `basedir` resolves to that directory. Path components are
 /// joined with [p.join] to avoid the fragile string concatenation used
 /// previously.
+///
+/// Prefer passing a native file path (e.g. from [Uri.toFilePath]). URI-style
+/// paths such as `/C:/...` (the result of [Uri.path] on Windows) are also
+/// accepted via a [Uri.parse] fallback, since [Uri.file] rejects them.
 Uri _resolveTestFileUri(String testUrl) {
   final bool looksLikeDartFile = testUrl.endsWith('.dart');
 
   if (looksLikeDartFile) {
-    return Uri.file(testUrl);
+    return _uriFromPath(testUrl);
   }
 
   final String fileName = p.basename(testUrl);
   final String syntheticTestFile =
       p.join(testUrl, '${fileName}_golden_test.dart');
 
-  return Uri.file(syntheticTestFile);
+  return _uriFromPath(syntheticTestFile);
+}
+
+Uri _uriFromPath(String path) {
+  try {
+    return Uri.file(path);
+  } on ArgumentError {
+    // Windows [Uri.path] values look like `/C:/...` and are rejected by
+    // [Uri.file]; [Uri.parse] accepts that form.
+    return Uri.parse(path);
+  }
 }
