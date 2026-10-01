@@ -52,6 +52,41 @@ void main() {
       expect(configuration.goldenDifferenceThreshold, equals(25.5));
     });
 
+    test('goldenDifferenceRatio returns the threshold divided by 100', () {
+      final configuration = BcGoldenConfiguration();
+
+      configuration.goldenDifferenceThreshold = 0.5;
+
+      expect(configuration.goldenDifferenceRatio, equals(0.005));
+    });
+
+    test('setThresholdRatio sets the equivalent percentage', () {
+      final configuration = BcGoldenConfiguration();
+
+      configuration.setThresholdRatio(0.005);
+
+      expect(configuration.goldenDifferenceThreshold, equals(0.5));
+      expect(configuration.goldenDifferenceRatio, equals(0.005));
+    });
+
+    test('rejects a threshold outside the 0..100 range', () {
+      final configuration = BcGoldenConfiguration();
+
+      expect(
+        () => configuration.goldenDifferenceThreshold = 150,
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('rejects a ratio outside the 0..1 range', () {
+      final configuration = BcGoldenConfiguration();
+
+      expect(
+        () => configuration.setThresholdRatio(1.5),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
     test('should allow setting willFailOnError', () {
       final configuration = BcGoldenConfiguration();
 

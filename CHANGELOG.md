@@ -1,4 +1,8 @@
 # Changelog
+## 3.1.0
+- Add `localizationsDelegates`, `supportedLocales`, `locale`, `appWrapper`, and `wrapInScaffold` parameters across golden test helpers.
+- Fix `willFailOnError: false` approval behavior in `LocalFileComparatorWithThreshold`.
+
 ## 3.0.2
 - Fix pending timers in `BcGoldenCapture.single`.
 

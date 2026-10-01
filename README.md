@@ -50,12 +50,10 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 
   BcGoldenConfiguration bcGoldenConfiguration = BcGoldenConfiguration();
 
-  bcGoldenConfiguration.setThemeProvider = [
-    ChangeNotifierProvider(create: (_) => BcThemeNotifier()),
-    ...BancolombiaFoundations.themeProvider,
-  ];
+  bcGoldenConfiguration.themeData = BcThemeData.lightTheme;
 
-  bcGoldenConfiguration.setThemeData = BcThemeData.lightTheme;
+  // Set tolerance ratio (e.g. 0.5% tolerance)
+  bcGoldenConfiguration.setThresholdRatio(0.005);
 
   await loadConfiguration();
 
@@ -197,6 +195,29 @@ The `GoldenCaptureConfig` class allows you to customize how multiple screenshots
 - `maxScreensPerRow`: Maximum screenshots per row (for grid layout)
 - `device`: Optional device configuration
 
+### Internationalization (i18n) and State Management Injection 🌍
+
+To test widgets that consume internationalization (`context.loc` / `AppLocalizations`) or depend on modern state management solutions (Riverpod `ProviderScope`, Bloc `BlocProvider`, `GetIt`), pass `localizationsDelegates`, `supportedLocales`, `locale`, or an `appWrapper`:
+
+```dart
+await bcWidgetMatchesImage(
+  imageName: 'my_screen_i18n',
+  widget: const MyScreen(),
+  tester: tester,
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+  locale: const Locale('es'),
+  appWrapper: (app) => ProviderScope(
+    overrides: [
+      userProvider.overrideWith((ref) => MockUser()),
+    ],
+    child: app,
+  ),
+);
+```
+
+You can also pass `appWrapper`, `localizationsDelegates`, `supportedLocales`, and `locale` directly into `BcGoldenCapture.multiple` or `BcGoldenCapture.animation`.
+
 ### Animation Testing 🎬
 
 For testing animations at specific timestamps, use `BcGoldenCapture.animation`:
@@ -337,44 +358,24 @@ BcGoldenCapture.multiple(
 
 This will generate a single golden file containing all screenshots arranged according to your configuration.
 
-## LocalFileComparator
-The local file comparator class will let customize the aceptable difference between two images,
-so if the difference is below this custom value the test will pass.
+## LocalFileComparator & Tolerance Threshold 📈
+
+To handle minor cross-platform rendering differences (e.g., macOS vs. Linux CI anti-aliasing), `bc_golden_plugin` provides an integrated `LocalFileComparatorWithThreshold`.
+
+Instead of writing custom comparator boilerplate, configure the tolerance threshold in `BcGoldenConfiguration` or directly in your test setup:
 
 ```dart
-class LocalFileComparatorWithThreshold extends LocalFileComparator {
-  final double threshold;
+// Set tolerance as a percentage (e.g., 0.5%)
+bcGoldenConfiguration.goldenDifferenceThreshold = 0.5;
 
-  LocalFileComparatorWithThreshold(Uri testFile, this.threshold)
-      : assert(threshold >= 0 && threshold <= 1),
-        super(testFile);
+// Or set using explicit ratio (0.005 = 0.5%)
+bcGoldenConfiguration.setThresholdRatio(0.005);
 
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-
-    if (!result.passed && result.diffPercent <= threshold) {
-      debugPrint(
-        'Se encontró una diferencia de ${result.diffPercent * 100}%, pero es '
-        'un valor aceptable, dado que el porcentaje de aceptación es de '
-        '${threshold * 100}%',
-      );
-
-      return true;
-    }
-
-    if (!result.passed) {
-      final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
-    }
-    return result.passed;
-  }
-}
-
+// Control whether visual diffs fail the test (defaults to true)
+bcGoldenConfiguration.willFailOnError = true;
 ```
+
+When using `bcWidgetMatchesImage` or `BcGoldenCapture`, the comparator is initialized automatically with the configured threshold.
 
 ## Example of usage 🤌🏻
 

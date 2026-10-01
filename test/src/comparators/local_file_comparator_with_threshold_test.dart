@@ -242,5 +242,27 @@ void main() {
         );
       },
     );
+
+    test('update writes the given bytes as the golden (threshold ignored)',
+        () async {
+      final Directory updateTmp =
+          Directory.systemTemp.createTempSync('goldens_update_');
+      addTearDown(() => updateTmp.deleteSync(recursive: true));
+
+      final LocalFileComparatorWithThreshold updateComparator =
+          LocalFileComparatorWithThreshold(
+        Uri.file('${updateTmp.path}/dummy_base_test.dart'),
+        0.0,
+      );
+
+      final Uri goldenUri = Uri.parse('generated.png');
+      final Uint8List bytes = pngSolid(4, 1, 2, 3);
+
+      await updateComparator.update(goldenUri, bytes);
+
+      final File written = File('${updateTmp.path}/generated.png');
+      expect(written.existsSync(), isTrue);
+      expect(written.readAsBytesSync(), equals(bytes));
+    });
   });
 }

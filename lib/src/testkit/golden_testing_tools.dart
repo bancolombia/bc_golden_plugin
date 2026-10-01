@@ -98,6 +98,12 @@ class BcGoldenCapture {
     GoldenCaptureConfig config, {
     Level logLevel = Level.nothing,
     bool shouldUseRealShadows = true,
+    ThemeData? customTheme,
+    Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
+    Iterable<Locale>? supportedLocales,
+    Locale? locale,
+    Widget Function(Widget app)? appWrapper,
+    bool wrapInScaffold = true,
   }) {
     setLogLevel(logLevel);
 
@@ -127,6 +133,12 @@ class BcGoldenCapture {
               TestBase.appGoldenTest(
                 widget: step.widgetBuilder(),
                 key: GlobalKey(),
+                customTheme: customTheme,
+                localizationsDelegates: localizationsDelegates,
+                supportedLocales: supportedLocales,
+                locale: locale,
+                appWrapper: appWrapper,
+                wrapInScaffold: wrapInScaffold,
               ),
             );
 
@@ -219,6 +231,12 @@ class BcGoldenCapture {
     Future<void> Function(WidgetTester)? animationSetup,
     bool shouldUseRealShadows = true,
     Level logLevel = Level.nothing,
+    ThemeData? customTheme,
+    Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
+    Iterable<Locale>? supportedLocales,
+    Locale? locale,
+    Widget Function(Widget app)? appWrapper,
+    bool wrapInScaffold = true,
   }) {
     setLogLevel(logLevel);
 
@@ -250,6 +268,12 @@ class BcGoldenCapture {
                 TestBase.appGoldenTest(
                   widget: widget,
                   key: GlobalKey(),
+                  customTheme: customTheme,
+                  localizationsDelegates: localizationsDelegates,
+                  supportedLocales: supportedLocales,
+                  locale: locale,
+                  appWrapper: appWrapper,
+                  wrapInScaffold: wrapInScaffold,
                 ),
                 config,
                 animationSetup,
@@ -327,6 +351,16 @@ void bcGoldenTest(
 /// [awaitImages], so the golden capture reflects the settled state instead
 /// of frame 0. Defaults to `null`, which preserves the previous behavior
 /// (no settle).
+/// * [localizationsDelegates] / [supportedLocales] / [locale] (optional)
+/// configure internationalization so widgets that read localized strings
+/// (e.g. `context.loc` / `AppLocalizations`) render correctly in the golden.
+/// * [appWrapper] (optional) builder to wrap the whole app under test with an
+/// external dependency tree (e.g. a Riverpod `ProviderScope`, a Bloc provider,
+/// a GetIt scope) without reimplementing the base. When omitted, the previous
+/// behavior is preserved.
+/// * [wrapInScaffold] (optional, defaults to `true`) set it to `false` when the
+/// [widget] already provides its own scaffold (e.g. a full screen), to avoid a
+/// double scaffold in the golden.
 Future<void> bcWidgetMatchesImage({
   required String imageName,
   required Widget widget,
@@ -337,6 +371,11 @@ Future<void> bcWidgetMatchesImage({
   WindowConfigData? device,
   ThemeData? customTheme,
   Duration? settleAfterPump,
+  Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
+  Iterable<Locale>? supportedLocales,
+  Locale? locale,
+  Widget Function(Widget app)? appWrapper,
+  bool wrapInScaffold = true,
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
@@ -353,6 +392,11 @@ Future<void> bcWidgetMatchesImage({
       height: height,
       textScaleFactor: textScaleFactor,
       customTheme: customTheme,
+      localizationsDelegates: localizationsDelegates,
+      supportedLocales: supportedLocales,
+      locale: locale,
+      appWrapper: appWrapper,
+      wrapInScaffold: wrapInScaffold,
     ),
   );
 
