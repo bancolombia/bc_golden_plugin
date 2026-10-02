@@ -73,6 +73,7 @@ analyzer:
   exclude:
     - "**.mocks.dart"
     - "**.g.dart"
+    - build/**
   plugins:
     - dart_code_linter
 

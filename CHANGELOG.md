@@ -1,4 +1,8 @@
 # Changelog
+## 3.1.1
+- Add per-test `includeOverlays` (default `false`) so dialogs/`showDialog` can be captured and read `themeProvider` without changing existing goldens (#41).
+- Fix Windows `Illegal character in path` when resolving golden paths by using `Uri.toFilePath()` instead of `Uri.path` (#42).
+
 ## 3.1.0
 - Add `localizationsDelegates`, `supportedLocales`, `locale`, `appWrapper`, and `wrapInScaffold` parameters across golden test helpers.
 - Fix `willFailOnError: false` approval behavior in `LocalFileComparatorWithThreshold`.
