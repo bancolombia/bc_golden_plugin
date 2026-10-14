@@ -1,4 +1,8 @@
 # Changelog
+## 3.2.0
+- Add `settle` option to `GoldenStep` to skip `pumpAndSettle` in `BcGoldenCapture.multiple` for screens that never settle (#44).
+- Remove the `equatable` dependency. `WindowConfigData` keeps `props`, `==`, `hashCode` and `toString`, but no longer extends `Equatable`.
+
 ## 3.1.0
 - Add `localizationsDelegates`, `supportedLocales`, `locale`, `appWrapper`, and `wrapInScaffold` parameters across golden test helpers.
 - Fix `willFailOnError: false` approval behavior in `LocalFileComparatorWithThreshold`.

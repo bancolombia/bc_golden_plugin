@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -38,7 +37,7 @@ class WindowConfig extends InheritedWidget {
 }
 
 /// A Data class that describe a device properties that will impact design.
-class WindowConfigData extends Equatable {
+class WindowConfigData {
   WindowConfigData(
     this.name, {
     required this.size,
@@ -100,7 +99,6 @@ class WindowConfigData extends Equatable {
   /// This represent the size of the device, expressed in `px`.
   final Size physicalSize;
 
-  @override
   List<Object?> get props => [
         name,
         size,
@@ -113,6 +111,26 @@ class WindowConfigData extends Equatable {
         padding,
         physicalSize,
       ];
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WindowConfigData || runtimeType != other.runtimeType) {
+      return false;
+    }
+    final otherProps = other.props;
+    final thisProps = props;
+    for (int i = 0; i < thisProps.length; i++) {
+      if (thisProps[i] != otherProps[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, Object.hashAll(props));
+
+  @override
+  String toString() => '$runtimeType(${props.join(', ')})';
 }
 
 /// Implementation of the abstract class [FakeViewPadding].
