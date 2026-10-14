@@ -1,4 +1,8 @@
 # Changelog
+## 3.2.0
+- Add `settle` option to `GoldenStep` to skip `pumpAndSettle` in `BcGoldenCapture.multiple` for screens that never settle (#44).
+- Remove the `equatable` dependency. `WindowConfigData` keeps `props`, `==`, `hashCode` and `toString`, but no longer extends `Equatable`.
+
 ## 3.1.1
 - Add per-test `includeOverlays` (default `false`) so dialogs/`showDialog` can be captured and read `themeProvider` without changing existing goldens (#41).
 - Fix Windows `Illegal character in path` when resolving golden paths by using `Uri.toFilePath()` instead of `Uri.path` (#42).

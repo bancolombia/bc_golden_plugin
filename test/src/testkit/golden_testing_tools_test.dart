@@ -15,6 +15,7 @@ class FakeGoldenStep implements GoldenStep {
     required this.widgetBuilder,
     this.setupAction,
     this.verifyAction,
+    this.settle = true,
   });
 
   @override
@@ -25,6 +26,8 @@ class FakeGoldenStep implements GoldenStep {
   final Future<void> Function(WidgetTester)? setupAction;
   @override
   final Future<void> Function(WidgetTester)? verifyAction;
+  @override
+  final bool settle;
 }
 
 /// Widget that starts timers on mount, like widgets with animations,

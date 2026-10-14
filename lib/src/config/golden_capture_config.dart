@@ -51,6 +51,8 @@ enum CaptureLayoutType {
 /// * [widgetBuilder] A function that returns the widget to be rendered for this step.
 /// * [setupAction] An optional function to perform setup actions before capturing the screenshot.
 /// * [verifyAction] An optional function to perform verification actions after rendering the widget.
+/// * [settle] Whether to call `pumpAndSettle` after [setupAction]. Set it to `false` for screens
+///   with endless animations or active events that never settle; a single `pump` is used instead.
 ///
 /// The `GoldenStep` class is used in conjunction with the `BcGoldenCapture.multiple` function to create a series of golden tests.
 /// {@category Configuration}
@@ -60,10 +62,12 @@ class GoldenStep {
     required this.widgetBuilder,
     this.setupAction,
     this.verifyAction,
+    this.settle = true,
   });
 
   final String stepName;
   final Widget Function() widgetBuilder;
   final Future<void> Function(WidgetTester)? setupAction;
   final Future<void> Function(WidgetTester)? verifyAction;
+  final bool settle;
 }

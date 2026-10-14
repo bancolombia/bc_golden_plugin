@@ -89,6 +89,7 @@ class BcGoldenCapture {
   /// - `widgetBuilder`: A function that returns the widget to be rendered.
   /// - `setupAction`: An optional function to perform setup actions before capturing the screenshot.
   /// - `verifyAction`: An optional function to perform verification actions after rendering the widget.
+  /// - `settle`: Whether to `pumpAndSettle` after the setup action (default `true`). Use `false` when the screen never settles.
   ///
   /// The combined screenshot is saved in the 'goldens' directory with a filename based on the test name.
   @isTest
@@ -156,7 +157,11 @@ class BcGoldenCapture {
               '[flows][multiple] ✓ Setup action completed for step ${index + 1}/${steps.length}: ${step.stepName}',
             );
 
-            await tester.pumpAndSettle();
+            if (step.settle) {
+              await tester.pumpAndSettle();
+            } else {
+              await tester.pump();
+            }
 
             if (index > 0) {
               await tester.pump(config.delayBetweenScreens);
