@@ -105,6 +105,7 @@ class BcGoldenCapture {
     Locale? locale,
     Widget Function(Widget app)? appWrapper,
     bool wrapInScaffold = true,
+    bool includeOverlays = false,
   }) {
     setLogLevel(logLevel);
 
@@ -140,6 +141,7 @@ class BcGoldenCapture {
                 locale: locale,
                 appWrapper: appWrapper,
                 wrapInScaffold: wrapInScaffold,
+                includeOverlays: includeOverlays,
               ),
             );
 
@@ -199,8 +201,9 @@ class BcGoldenCapture {
 
           logDebug('[flows][multiple] ✓ Combined screenshots successfully.');
 
-          final testPath =
-              (goldenFileComparator as LocalFileComparator).basedir.path;
+          final testPath = (goldenFileComparator as LocalFileComparator)
+              .basedir
+              .toFilePath();
 
           await localFileComparator(testPath);
 
@@ -242,6 +245,7 @@ class BcGoldenCapture {
     Locale? locale,
     Widget Function(Widget app)? appWrapper,
     bool wrapInScaffold = true,
+    bool includeOverlays = false,
   }) {
     setLogLevel(logLevel);
 
@@ -279,14 +283,16 @@ class BcGoldenCapture {
                   locale: locale,
                   appWrapper: appWrapper,
                   wrapInScaffold: wrapInScaffold,
+                  includeOverlays: includeOverlays,
                 ),
                 config,
                 animationSetup,
               );
 
               logDebug('[golden][animation] Comparing with golden file...');
-              final testPath =
-                  (goldenFileComparator as LocalFileComparator).basedir.path;
+              final testPath = (goldenFileComparator as LocalFileComparator)
+                  .basedir
+                  .toFilePath();
               await localFileComparator(testPath);
 
               await expectLater(
@@ -366,6 +372,9 @@ void bcGoldenTest(
 /// * [wrapInScaffold] (optional, defaults to `true`) set it to `false` when the
 /// [widget] already provides its own scaffold (e.g. a full screen), to avoid a
 /// double scaffold in the golden.
+/// * [includeOverlays] (optional, defaults to `false`) when `true`, wraps the
+/// Navigator so overlays such as dialogs are included in the golden capture and
+/// can read `themeProvider`. Leave `false` to preserve existing golden images.
 Future<void> bcWidgetMatchesImage({
   required String imageName,
   required Widget widget,
@@ -381,10 +390,12 @@ Future<void> bcWidgetMatchesImage({
   Locale? locale,
   Widget Function(Widget app)? appWrapper,
   bool wrapInScaffold = true,
+  bool includeOverlays = false,
 }) async {
   assert(!imageName.endsWith('.png'), 'The image cannot have type extension');
 
-  final testPath = (goldenFileComparator as LocalFileComparator).basedir.path;
+  final testPath =
+      (goldenFileComparator as LocalFileComparator).basedir.toFilePath();
 
   final String imageFinalPath = '$testPath$_folderPath/$imageName.png';
 
@@ -402,6 +413,7 @@ Future<void> bcWidgetMatchesImage({
       locale: locale,
       appWrapper: appWrapper,
       wrapInScaffold: wrapInScaffold,
+      includeOverlays: includeOverlays,
     ),
   );
 

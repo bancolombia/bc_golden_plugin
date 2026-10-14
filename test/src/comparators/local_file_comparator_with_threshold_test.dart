@@ -104,6 +104,38 @@ void main() {
         expect(goldenFileComparator, isA<LocalFileComparatorWithThreshold>());
       },
     );
+
+    test(
+      'localFileComparator accepts native paths from Uri.toFilePath (#42)',
+      () async {
+        final Directory tmp =
+            Directory.systemTemp.createTempSync('goldens_path_');
+        addTearDown(() => tmp.deleteSync(recursive: true));
+
+        final Uri basedir = Uri.file('${tmp.path}/');
+        final String nativePath = basedir.toFilePath();
+
+        await localFileComparator(nativePath);
+
+        expect(goldenFileComparator, isA<LocalFileComparatorWithThreshold>());
+        expect(
+          (goldenFileComparator as LocalFileComparator).basedir.toFilePath(),
+          basedir.toFilePath(),
+        );
+      },
+    );
+
+    test(
+      'localFileComparator accepts URI-style Windows paths as fallback (#42)',
+      () async {
+        // Simulates Uri.path on Windows (`/C:/...`), which Uri.file rejects.
+        const String windowsUriPath = '/C:/proyecto/test/goldens/';
+
+        await localFileComparator(windowsUriPath);
+
+        expect(goldenFileComparator, isA<LocalFileComparatorWithThreshold>());
+      },
+    );
   });
 
   group('image comparisons', () {
