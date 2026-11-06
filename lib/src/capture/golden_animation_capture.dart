@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../config/golden_animation_config.dart';
-import '../config/golden_capture_config.dart';
 import '../helpers/logger.dart';
 import 'golden_screenshot.dart';
 import 'helpers.dart';
@@ -165,7 +164,7 @@ extension GoldenAnimationCapture on WidgetTester {
         '[flows][combineScreenshots] Screen dimensions: ${screenWidth}x$screenHeight',
       );
 
-      final canvasDimensions = _calculateCanvasDimensions(
+      final canvasDimensions = calculateCanvasDimensions(
         screenshots.length,
         screenWidth,
         screenHeight,
@@ -209,7 +208,7 @@ extension GoldenAnimationCapture on WidgetTester {
 
         try {
           final image = await decodeImageBytes(screenshots[index]);
-          final position = _calculateImagePosition(
+          final position = calculateImagePosition(
             index,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
@@ -338,55 +337,5 @@ extension GoldenAnimationCapture on WidgetTester {
     );
 
     textPainter.dispose();
-  }
-
-  Size _calculateCanvasDimensions(
-    int screenCount,
-    double screenWidth,
-    double screenHeight,
-    GoldenAnimationConfig config,
-  ) {
-    const titleHeight = 40.0;
-    const padding = 20.0;
-
-    if (screenCount > 5) {
-      final rows = (screenCount / config.maxScreensPerRow).ceil();
-      final cols = config.maxScreensPerRow;
-
-      return Size(
-        (screenWidth + config.spacing) * cols + padding,
-        (screenHeight + titleHeight + config.spacing) * rows + padding,
-      );
-    }
-
-    return Size(
-      (screenWidth + config.spacing) * screenCount + padding,
-      screenHeight + titleHeight + (padding * 2),
-    );
-  }
-
-  Offset _calculateImagePosition(
-    int index,
-    double screenWidth,
-    double screenHeight,
-    GoldenCaptureConfig config,
-  ) {
-    const padding = 20.0;
-    const titleHeight = 40.0;
-
-    if (index >= 5) {
-      final row = (index / config.maxScreensPerRow).floor();
-      final col = index % config.maxScreensPerRow;
-
-      return Offset(
-        padding + (screenWidth + config.spacing) * col,
-        padding + (screenHeight + titleHeight + config.spacing) * row,
-      );
-    }
-
-    return Offset(
-      padding + (screenWidth + config.spacing) * index,
-      padding,
-    );
   }
 }

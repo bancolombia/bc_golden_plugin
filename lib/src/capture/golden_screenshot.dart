@@ -135,7 +135,7 @@ extension GoldenScreenshot on WidgetTester {
         '[flows][combineScreenshots] Screen dimensions: ${screenWidth}x$screenHeight',
       );
 
-      final canvasDimensions = _calculateCanvasDimensions(
+      final canvasDimensions = calculateCanvasDimensions(
         screenshots.length,
         screenWidth,
         screenHeight,
@@ -179,7 +179,7 @@ extension GoldenScreenshot on WidgetTester {
 
         try {
           final image = await decodeImageBytes(screenshots[index]);
-          final position = _calculateImagePosition(
+          final position = calculateImagePosition(
             index,
             screenWidth * scaleFactor,
             screenHeight * scaleFactor,
@@ -314,72 +314,6 @@ extension GoldenScreenshot on WidgetTester {
     logDebug('[flows][_cropImage] Decoding cropped image from pixels...');
 
     return completer.future;
-  }
-
-  /// Calculates the dimensions of the canvas based on layout configuration.
-  Size _calculateCanvasDimensions(
-    int screenCount,
-    double screenWidth,
-    double screenHeight,
-    GoldenCaptureConfig config,
-  ) {
-    const titleHeight = 40.0;
-    const padding = 20.0;
-
-    switch (config.layoutType) {
-      case CaptureLayoutType.vertical:
-        return Size(
-          screenWidth + (padding * 2),
-          (screenHeight + titleHeight + config.spacing) * screenCount + padding,
-        );
-
-      case CaptureLayoutType.horizontal:
-        return Size(
-          (screenWidth + config.spacing) * screenCount + padding,
-          screenHeight + titleHeight + (padding * 2),
-        );
-
-      case CaptureLayoutType.grid:
-        final rows = (screenCount / config.maxScreensPerRow).ceil();
-        final cols = config.maxScreensPerRow;
-        return Size(
-          (screenWidth + config.spacing) * cols + padding,
-          (screenHeight + titleHeight + config.spacing) * rows + padding,
-        );
-    }
-  }
-
-  /// Calculates the position of an image on the canvas.
-  Offset _calculateImagePosition(
-    int index,
-    double screenWidth,
-    double screenHeight,
-    GoldenCaptureConfig config,
-  ) {
-    const titleHeight = 40.0;
-    const padding = 20.0;
-
-    switch (config.layoutType) {
-      case CaptureLayoutType.vertical:
-        return Offset(
-          padding,
-          padding + (screenHeight + titleHeight + config.spacing) * index,
-        );
-
-      case CaptureLayoutType.horizontal:
-        return Offset(
-          padding + (screenWidth + config.spacing) * index,
-          padding,
-        );
-
-      case CaptureLayoutType.grid:
-        final row = index ~/ config.maxScreensPerRow;
-        final col = index % config.maxScreensPerRow;
-        return Offset(
-          padding + (screenWidth + config.spacing) * col,
-          padding + (screenHeight + titleHeight + config.spacing) * row,
-        );
-    }
   }
 
   /// Draws the step title on the canvas.
