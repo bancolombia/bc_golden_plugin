@@ -180,11 +180,12 @@ extension GoldenScreenshot on WidgetTester {
         try {
           final image = await decodeImageBytes(screenshots[index]);
           final position = calculateImagePosition(
-            index,
-            screenWidth * scaleFactor,
-            screenHeight * scaleFactor,
-            config,
-          );
+                index,
+                screenWidth,
+                screenHeight,
+                config,
+              ) *
+              scaleFactor;
 
           final srcRect = Rect.fromLTWH(
             0,

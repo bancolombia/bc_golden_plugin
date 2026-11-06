@@ -491,6 +491,70 @@ void main() {
       );
     });
 
+    group('combineAnimationScreenshots scaling', () {
+      testWidgets(
+        'keeps the last frame inside a canvas scaled to 4096',
+        (tester) async {
+          await tester.runAsync(() async {
+            // 12 frames of 400x200: (400 + 24) * 12 + 20 = 5108 > 4096.
+            await tester.pumpWidget(
+              const Directionality(
+                textDirection: TextDirection.ltr,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: RepaintBoundary(
+                    child: SizedBox(
+                      width: 400,
+                      height: 200,
+                      child: ColoredBox(color: Color(0xFFFF0000)),
+                    ),
+                  ),
+                ),
+              ),
+            );
+            await tester.pumpAndSettle();
+            tester.clearGoldenScreenshots();
+            for (int i = 0; i < 12; i++) {
+              await tester.captureGoldenScreenshot();
+            }
+
+            final config = GoldenAnimationConfig(
+              testName: 'scaled_canvas',
+              totalDuration: const Duration(milliseconds: 1200),
+              animationSteps: List.generate(
+                12,
+                (index) => GoldenAnimationStep(
+                  timestamp: Duration(milliseconds: index * 100),
+                  frameName: 'frame$index',
+                ),
+              ),
+            );
+
+            final png = await tester.combineAnimationScreenshots(
+              config,
+              config.animationSteps.map((step) => step.frameName).toList(),
+            );
+            final codec = await ui.instantiateImageCodec(png);
+            final image = (await codec.getNextFrame()).image;
+            final pixels = await image.toByteData() ?? ByteData(0);
+            Color pixelAt(int x, int y) => Color(
+                pixels.getUint32((y * image.width + x) * 4) >> 8 | 0xFF000000);
+
+            expect(image.width, 4096);
+            final frameMiddleY = (image.height * 0.4).toInt();
+            // The trailing spacing (24px before scaling) stays white...
+            expect(pixelAt(image.width - 1, frameMiddleY), Colors.white);
+            // ...and the last frame ends just before it.
+            expect(
+              pixelAt(image.width - 24, frameMiddleY),
+              const Color(0xFFFF0000),
+            );
+            image.dispose();
+          });
+        },
+      );
+    });
+
     group('integration tests', () {
       testWidgets('complete animation capture workflow', (tester) async {
         await tester.runAsync(() async {

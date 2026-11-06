@@ -210,6 +210,48 @@ void main() {
     });
 
     testWidgets(
+      'keeps the last screen inside a canvas scaled to 4096',
+      (tester) async {
+        await tester.runAsync(() async {
+          // 10 screens of 300x500, vertical: (500 + 40 + 16) * 10 + 20 = 5580.
+          await tester.pumpWidget(
+            createColorWidget(const Color(0xFFFF0000), const Size(300, 500)),
+          );
+          await tester.pumpAndSettle();
+          for (int i = 0; i < 10; i++) {
+            await tester.captureGoldenScreenshot();
+          }
+
+          const config = GoldenCaptureConfig(
+            testName: 'Test',
+            layoutType: CaptureLayoutType.vertical,
+            spacing: 16,
+          );
+          final combined = await tester.combineGoldenScreenshots(
+            config,
+            List<String>.generate(10, (i) => 'Step ${i + 1}'),
+          );
+          final img = await decode(combined);
+          final pixels = await img.toByteData() ?? ByteData(0);
+          Color pixelAt(int x, int y) => Color(
+                pixels.getUint32((y * img.width + x) * 4) >> 8 | 0xFF000000,
+              );
+
+          expect(img.height, 4096);
+          final frameMiddleX = img.width ~/ 2;
+          // Below the last title bar, 26px (unscaled) of margin stays white...
+          expect(pixelAt(frameMiddleX, img.height - 1), Colors.white);
+          // ...and the last screen ends 56px (unscaled) above the bottom.
+          expect(
+            pixelAt(frameMiddleX, img.height - 46),
+            const Color(0xFFFF0000),
+          );
+          img.dispose();
+        });
+      },
+    );
+
+    testWidgets(
       'fails if stepnames list is shorter than screenshots',
       (tester) async {
         await tester.runAsync(() async {
