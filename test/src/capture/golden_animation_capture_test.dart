@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:bc_golden_plugin/bc_golden_plugin.dart';
 import 'package:flutter/material.dart';
@@ -334,7 +335,6 @@ void main() {
               await tester.pumpWidget(testWidget);
               await tester.pumpAndSettle();
 
-              // Capture more than 5 screenshots to trigger grid layout
               for (int i = 0; i < 7; i++) {
                 await tester.captureGoldenScreenshot();
               }
@@ -349,6 +349,7 @@ void main() {
                     frameName: 'frame${index + 1}',
                   ),
                 ),
+                layoutType: CaptureLayoutType.grid,
                 maxScreensPerRow: 3,
               );
 
@@ -368,6 +369,191 @@ void main() {
         );
       },
     );
+
+    group('combineAnimationScreenshots honours layoutType', () {
+      // Each frame is a 100x180 RepaintBoundary, so the canvas size is exact:
+      // title 40, padding 20, spacing 10 (see calculateCanvasDimensions).
+      const frameSize = Size(100, 180);
+      const spacing = 10.0;
+
+      Widget frameWidget() => const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: RepaintBoundary(
+                child: SizedBox(
+                  width: 100,
+                  height: 180,
+                  child: ColoredBox(color: Colors.blue),
+                ),
+              ),
+            ),
+          );
+
+      GoldenAnimationConfig configWith(
+        int frames,
+        CaptureLayoutType layoutType, {
+        int maxScreensPerRow = 5,
+      }) =>
+          GoldenAnimationConfig(
+            testName: 'layout_${layoutType.name}',
+            totalDuration: Duration(milliseconds: frames * 100),
+            animationSteps: List.generate(
+              frames,
+              (index) => GoldenAnimationStep(
+                timestamp: Duration(milliseconds: index * 100),
+                frameName: 'frame$index',
+              ),
+            ),
+            layoutType: layoutType,
+            maxScreensPerRow: maxScreensPerRow,
+            spacing: spacing,
+          );
+
+      Future<Size> combinedSize(
+        WidgetTester tester,
+        GoldenAnimationConfig config,
+      ) async {
+        await tester.pumpWidget(frameWidget());
+        await tester.pumpAndSettle();
+        tester.clearGoldenScreenshots();
+        for (final _ in config.animationSteps) {
+          await tester.captureGoldenScreenshot();
+        }
+
+        final png = await tester.combineAnimationScreenshots(
+          config,
+          config.animationSteps.map((step) => step.frameName).toList(),
+        );
+        final codec = await ui.instantiateImageCodec(png);
+        final image = (await codec.getNextFrame()).image;
+        final size = Size(image.width.toDouble(), image.height.toDouble());
+        image.dispose();
+
+        return size;
+      }
+
+      testWidgets(
+        'horizontal keeps more than 5 frames in a single row',
+        (tester) async {
+          await tester.runAsync(() async {
+            final size = await combinedSize(
+              tester,
+              configWith(7, CaptureLayoutType.horizontal),
+            );
+
+            expect(
+              size,
+              const Size(
+                (100 + spacing) * 7 + 20,
+                180 + 40 + 20 * 2,
+              ),
+            );
+          });
+        },
+      );
+
+      testWidgets('vertical stacks frames in a single column', (tester) async {
+        await tester.runAsync(() async {
+          final size = await combinedSize(
+            tester,
+            configWith(3, CaptureLayoutType.vertical),
+          );
+
+          expect(
+            size,
+            Size(
+              frameSize.width + 20 * 2,
+              (frameSize.height + 40 + spacing) * 3 + 20,
+            ),
+          );
+        });
+      });
+
+      testWidgets(
+        'grid wraps by maxScreensPerRow even with 5 or fewer frames',
+        (tester) async {
+          await tester.runAsync(() async {
+            final size = await combinedSize(
+              tester,
+              configWith(4, CaptureLayoutType.grid, maxScreensPerRow: 2),
+            );
+
+            expect(
+              size,
+              Size(
+                (frameSize.width + spacing) * 2 + 20,
+                (frameSize.height + 40 + spacing) * 2 + 20,
+              ),
+            );
+          });
+        },
+      );
+    });
+
+    group('combineAnimationScreenshots scaling', () {
+      testWidgets(
+        'keeps the last frame inside a canvas scaled to 4096',
+        (tester) async {
+          await tester.runAsync(() async {
+            // 12 frames of 400x200: (400 + 24) * 12 + 20 = 5108 > 4096.
+            await tester.pumpWidget(
+              const Directionality(
+                textDirection: TextDirection.ltr,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: RepaintBoundary(
+                    child: SizedBox(
+                      width: 400,
+                      height: 200,
+                      child: ColoredBox(color: Color(0xFFFF0000)),
+                    ),
+                  ),
+                ),
+              ),
+            );
+            await tester.pumpAndSettle();
+            tester.clearGoldenScreenshots();
+            for (int i = 0; i < 12; i++) {
+              await tester.captureGoldenScreenshot();
+            }
+
+            final config = GoldenAnimationConfig(
+              testName: 'scaled_canvas',
+              totalDuration: const Duration(milliseconds: 1200),
+              animationSteps: List.generate(
+                12,
+                (index) => GoldenAnimationStep(
+                  timestamp: Duration(milliseconds: index * 100),
+                  frameName: 'frame$index',
+                ),
+              ),
+            );
+
+            final png = await tester.combineAnimationScreenshots(
+              config,
+              config.animationSteps.map((step) => step.frameName).toList(),
+            );
+            final codec = await ui.instantiateImageCodec(png);
+            final image = (await codec.getNextFrame()).image;
+            final pixels = await image.toByteData() ?? ByteData(0);
+            Color pixelAt(int x, int y) => Color(
+                pixels.getUint32((y * image.width + x) * 4) >> 8 | 0xFF000000);
+
+            expect(image.width, 4096);
+            final frameMiddleY = (image.height * 0.4).toInt();
+            // The trailing spacing (24px before scaling) stays white...
+            expect(pixelAt(image.width - 1, frameMiddleY), Colors.white);
+            // ...and the last frame ends just before it.
+            expect(
+              pixelAt(image.width - 24, frameMiddleY),
+              const Color(0xFFFF0000),
+            );
+            image.dispose();
+          });
+        },
+      );
+    });
 
     group('integration tests', () {
       testWidgets('complete animation capture workflow', (tester) async {

@@ -1,4 +1,8 @@
 # Changelog
+## Unreleased
+- Fix `BcGoldenCapture.animation` ignoring `layoutType` and `maxScreensPerRow`: it drew a grid whenever there were more than 5 frames and a single row otherwise. Animation captures now use the same layout code as flows.
+- Fix the last frames being cut off when a combined flow or animation image is scaled down to the 4096px limit: padding, spacing and title space are now scaled with the frames. Images under the limit are unchanged.
+
 ## 3.2.0
 - Add `settle` option to `GoldenStep` to skip `pumpAndSettle` in `BcGoldenCapture.multiple` for screens that never settle (#44).
 - Remove the `equatable` dependency. `WindowConfigData` keeps `props`, `==`, `hashCode` and `toString`, but no longer extends `Equatable`.
